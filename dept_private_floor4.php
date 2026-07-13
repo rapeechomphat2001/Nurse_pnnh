@@ -23,6 +23,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
 </head>
 <body>
 
+<!-- แถบบนสุด: เบอร์สายด่วนติดต่อ/อีเมล และปุ่มเข้าสู่ระบบสำหรับเจ้าหน้าที่ -->
 <div class="top-bar">
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div><i class="bi bi-telephone-fill"></i> สายด่วน: 044-316-999 ต่อ 4400 &nbsp;|&nbsp; <i class="bi bi-envelope-fill"></i> nursing@pkc.go.th</div>
@@ -30,6 +31,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
     </div>
 </div>
 
+<!-- แบนเนอร์หัวหน้าเว็บ: โลโก้โรงพยาบาล + ชื่อกลุ่มงานการพยาบาล/ชื่อแผนก ($DEPT_NAME) -->
 <div class="header-banner">
     <div class="container d-flex align-items-center">
         <div class="me-3">
@@ -42,6 +44,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
     </div>
 </div>
 
+<!-- เมนูหลักของเว็บกลุ่มงานการพยาบาล แบ่งเป็นหมวด: เกี่ยวกับกลุ่มงาน/งานบริหาร/งานบริการ/งานวิชาการ/คุณภาพทางการพยาบาล/งานสารสนเทศ/ข่าวประชาสัมพันธ์ -->
 <nav class="navbar navbar-expand-lg main-nav p-0 shadow-sm" id="mainNav">
     <div class="container">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="เปิดเมนู">
@@ -128,16 +131,19 @@ $DEPT_NAME = 'พิเศษชั้น4';
     </div>
 </nav>
 
+<!-- แคโรเซลรูปแบนเนอร์ประจำแผนก: ซ่อนไว้ก่อน (display:none) จะถูกแสดงโดย dept-banner.js เมื่อโหลดรูปจาก API สำเร็จ -->
 <div class="dept-hero-wrap" id="deptHeroWrap" style="display:none;">
     <div id="deptHeroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000"></div>
 </div>
 
+<!-- แถบวิสัยทัศน์ของกลุ่มงานการพยาบาล -->
 <div class="vision-bar text-center">
     <div class="container">
         " วิสัยทัศน์: กลุ่มงานการพยาบาลที่มีคุณภาพ มาตรฐาน เป็นที่ไว้วางใจของผู้รับบริการ ภายใต้หลักธรรมาภิบาล เพื่อสุขภาวะที่ดีของประชาชน "
     </div>
 </div>
 
+<!-- เนื้อหาหลักของแผนก: #deptMainContent เป็นที่ว่างรอ dept-api.js ดึงข้อมูล (เมนู/เนื้อหา/บุคลากร) ตาม DEPT_ID มาแสดงแทน spinner นี้ -->
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-9 col-xl-8" id="deptMainContent">
@@ -146,6 +152,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
     </div>
 </div>
 
+<!-- ส่วนท้ายเว็บไซต์: ข้อมูลติดต่อโรงพยาบาลและลิงก์หน่วยงานที่เกี่ยวข้อง -->
 <footer class="main-footer">
     <div class="container">
         <div class="row g-4">
@@ -178,6 +185,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
     </div>
 </footer>
 
+<!-- โมดัลแสดงรูปภาพ/PDF แบบเต็มจอ เปิดใช้เมื่อคลิกรูปหรือไฟล์แนบในเนื้อหาที่ดึงมาจาก API -->
 <div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-centered p-0" style="background:rgba(0,0,0,0.92);">
         <div class="modal-content border-0" style="background:transparent;">
@@ -190,6 +198,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
     </div>
 </div>
 
+<!-- โหลด Bootstrap JS, กำหนด DEPT_ID ให้สคริปต์ฝั่ง client รู้ว่ากำลังแสดงแผนกไหน แล้วโหลดสคริปต์ดึง/แสดงข้อมูลแผนกจาก API -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>window.DEPT_ID = <?= (int)$DEPT_ID ?>;</script>
 <script src="assets/js/api-config.js"></script>
@@ -197,6 +206,7 @@ $DEPT_NAME = 'พิเศษชั้น4';
 <script src="assets/js/dept-context.js"></script>
 <script src="assets/js/dept-banner.js"></script>
 <script>
+// เปิด/ปิดกล่อง Lightbox แสดงรูปภาพหรือ PDF แบบเต็มจอเมื่อคลิกที่รูป (.lightbox-trigger) หรือไฟล์แนบ (.pdf-lightbox-trigger)
 (function () {
     const modalEl = document.getElementById('lightboxModal');
     const imgEl   = document.getElementById('lightboxImg');
