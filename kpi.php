@@ -53,9 +53,10 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
                         <li><a class="dropdown-item" href="vision_mission.php"><i class="bi bi-eye-fill me-2"></i> วิสัยทัศน์ / พันธกิจ</a></li>
-                        <li><a class="dropdown-item" href="nurse_roster.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบพยาบาล</a></li>
+                        <li><a class="dropdown-item" href="nurse_roster.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบหัวหน้าพยาบาล</a></li>
                         <li><a class="dropdown-item" href="executives.php"><i class="bi bi-person-badge-fill me-2"></i> ทำเนียบหัวหน้ากลุ่มงาน</a></li>
                         <li><a class="dropdown-item" href="ward_heads.php"><i class="bi bi-person-lines-fill me-2"></i> ทำเนียบหัวหน้างาน</a></li>
+                        <li><a class="dropdown-item" href="personnel_gallery.php"><i class="bi bi-people-fill me-2"></i> รูปบุคลากร</a></li>
                     </ul>
                 </div>
 
@@ -74,6 +75,15 @@
                 </div>
 
                 <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="serviceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-clipboard2-check-fill me-1"></i>งานบริการ
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="serviceDropdown">
+                        <li><a class="dropdown-item" href="supervision_results.php"><i class="bi bi-clipboard-check me-2"></i> ผลการนิเทศ</a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-mortarboard-fill me-1"></i>งานวิชาการ
                     </a>
@@ -85,7 +95,7 @@
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="qualityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-star-fill me-1"></i>คุณภาพการพยาบาล
+                        <i class="bi bi-star-fill me-1"></i>คุณภาพทางการพยาบาล
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="qualityDropdown">
                         <li><a class="dropdown-item active" href="kpi.php"><i class="bi bi-bar-chart-fill me-2"></i> ตัวชี้วัดคุณภาพ</a></li>
@@ -108,7 +118,7 @@
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-bell-fill me-1"></i>ข่าวสารประชาสัมพันธ์
+                        <i class="bi bi-bell-fill me-1"></i>ข่าวประชาสัมพันธ์
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="newsDropdown">
                         <li><a class="dropdown-item" href="all_news.php"><i class="bi bi-megaphone-fill me-2"></i> ข่าวสาร</a></li>
@@ -144,7 +154,7 @@
         <div class="row g-4">
             <div class="col-md-4">
                 <h5><i class="bi bi-building"></i> กลุ่มงานการพยาบาล</h5>
-                <p class="small opacity-80 mt-2">โรงพยาบาลปากช่องนานา<br>มุ่งมั่นในการพัฒนาคุณภาพการพยาบาล เพื่อผู้ป่วยและผู้รับบริการทุกคน</p>
+                <p class="small opacity-80 mt-2">โรงพยาบาลปากช่องนานา<br>มุ่งมั่นในการพัฒนาคุณภาพทางการพยาบาล เพื่อผู้ป่วยและผู้รับบริการทุกคน</p>
             </div>
             <div class="col-md-4">
                 <h5><i class="bi bi-geo-alt-fill"></i> ติดต่อเรา</h5>

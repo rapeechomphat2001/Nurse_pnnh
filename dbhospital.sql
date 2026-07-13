@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `banners` (
 -- Dumping data for table db_hospital.banners: ~2 rows (approximately)
 INSERT INTO `banners` (`id`, `department_id`, `title`, `subtitle`, `image_name`, `link_url`, `sort_order`, `is_active`, `created_at`) VALUES
 	(1, NULL, 'พัฒนาคุณภาพอย่างต่อเนื่อง', '', '1782285999_banner___________________________________________.png', NULL, 1, 1, '2026-06-24 07:26:39'),
-	(3, 1, 'เทสรวมกุมารเวช', '', '1783655135_banner___________________________________________.png', NULL, 1, 1, '2026-07-10 03:45:35');
+	(3, 1, 'เทสรวมกุมารเวชกรรม', '', '1783655135_banner___________________________________________.png', NULL, 1, 1, '2026-07-10 03:45:35');
 
 -- Dumping structure for table db_hospital.departments
 CREATE TABLE IF NOT EXISTS `departments` (
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Dumping data for table db_hospital.users: ~4 rows (approximately)
 INSERT INTO `users` (`id`, `username`, `password_hash`, `role`, `department_id`, `display_name`, `created_at`) VALUES
 	(1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'main', NULL, 'ผู้ดูแลระบบหลัก', '2026-07-02 03:47:35'),
-	(2, 'กุมารเวช', 'ee79976c9380d5e337fc1c095ece8c8f22f91f306ceeb161fa51fecede2c4ba1', 'dept', 1, 'k', '2026-07-02 06:26:51'),
+	(2, 'กุมารเวชกรรม', 'ee79976c9380d5e337fc1c095ece8c8f22f91f306ceeb161fa51fecede2c4ba1', 'dept', 1, 'k', '2026-07-02 06:26:51'),
 	(3, 'ตรวจรักษาพิเศษ', 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f', 'dept', 2, '้้hh', '2026-07-02 06:28:40'),
 	(4, 'ผู้คลอด', '1f3ce40415a2081fa3eee75fc39fff8e56c22270d1a978a7249b592dcebd20b4', 'dept', 3, 'gh', '2026-07-02 06:40:11');
 

@@ -1,12 +1,12 @@
 <?php
-// หน้าอยู่ระหว่างการจัดทำ — ทำเนียบพยาบาล
+// หน้าอยู่ระหว่างการจัดทำ — ทำเนียบหัวหน้าพยาบาล
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ทำเนียบพยาบาล - กลุ่มงานการพยาบาล โรงพยาบาลปากช่องนานา</title>
+    <title>ทำเนียบหัวหน้าพยาบาล - กลุ่มงานการพยาบาล โรงพยาบาลปากช่องนานา</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,9 +53,10 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
                         <li><a class="dropdown-item" href="vision_mission.php"><i class="bi bi-eye-fill me-2"></i> วิสัยทัศน์ / พันธกิจ</a></li>
-                        <li><a class="dropdown-item active" href="nurse_roster.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบพยาบาล</a></li>
+                        <li><a class="dropdown-item active" href="nurse_roster.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบหัวหน้าพยาบาล</a></li>
                         <li><a class="dropdown-item" href="executives.php"><i class="bi bi-person-badge-fill me-2"></i> ทำเนียบหัวหน้ากลุ่มงาน</a></li>
                         <li><a class="dropdown-item" href="ward_heads.php"><i class="bi bi-person-lines-fill me-2"></i> ทำเนียบหัวหน้างาน</a></li>
+                        <li><a class="dropdown-item" href="personnel_gallery.php"><i class="bi bi-people-fill me-2"></i> รูปบุคลากร</a></li>
                     </ul>
                 </div>
 
@@ -74,6 +75,15 @@
                 </div>
 
                 <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="serviceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-clipboard2-check-fill me-1"></i>งานบริการ
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="serviceDropdown">
+                        <li><a class="dropdown-item" href="supervision_results.php"><i class="bi bi-clipboard-check me-2"></i> ผลการนิเทศ</a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-mortarboard-fill me-1"></i>งานวิชาการ
                     </a>
@@ -85,7 +95,7 @@
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="qualityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-star-fill me-1"></i>คุณภาพการพยาบาล
+                        <i class="bi bi-star-fill me-1"></i>คุณภาพทางการพยาบาล
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="qualityDropdown">
                         <li><a class="dropdown-item" href="kpi.php"><i class="bi bi-bar-chart-fill me-2"></i> ตัวชี้วัดคุณภาพ</a></li>
@@ -108,7 +118,7 @@
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-bell-fill me-1"></i>ข่าวสารประชาสัมพันธ์
+                        <i class="bi bi-bell-fill me-1"></i>ข่าวประชาสัมพันธ์
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="newsDropdown">
                         <li><a class="dropdown-item" href="all_news.php"><i class="bi bi-megaphone-fill me-2"></i> ข่าวสาร</a></li>
@@ -123,7 +133,7 @@
 
 <div class="page-header">
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h1><i class="bi bi-people-fill me-2"></i>ทำเนียบพยาบาล</h1>
+        <h1><i class="bi bi-people-fill me-2"></i>ทำเนียบหัวหน้าพยาบาล</h1>
     </div>
 </div>
 
@@ -132,7 +142,7 @@
         <div class="col-lg-9 col-xl-8" id="generalContent">
             <div class="empty-state">
         <i class="bi bi-cone-striped"></i>
-        <p>หน้า "ทำเนียบพยาบาล" อยู่ระหว่างการจัดทำ</p>
+        <p>หน้า "ทำเนียบหัวหน้าพยาบาล" อยู่ระหว่างการจัดทำ</p>
         <p class="small">ขออภัยในความไม่สะดวก กรุณากลับมาตรวจสอบใหม่อีกครั้งในภายหลัง</p>
     </div>
         </div>
@@ -144,7 +154,7 @@
         <div class="row g-4">
             <div class="col-md-4">
                 <h5><i class="bi bi-building"></i> กลุ่มงานการพยาบาล</h5>
-                <p class="small opacity-80 mt-2">โรงพยาบาลปากช่องนานา<br>มุ่งมั่นในการพัฒนาคุณภาพการพยาบาล เพื่อผู้ป่วยและผู้รับบริการทุกคน</p>
+                <p class="small opacity-80 mt-2">โรงพยาบาลปากช่องนานา<br>มุ่งมั่นในการพัฒนาคุณภาพทางการพยาบาล เพื่อผู้ป่วยและผู้รับบริการทุกคน</p>
             </div>
             <div class="col-md-4">
                 <h5><i class="bi bi-geo-alt-fill"></i> ติดต่อเรา</h5>
