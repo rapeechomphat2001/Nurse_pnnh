@@ -5,7 +5,6 @@
 
 body { background-color: #f8f4f0; font-family: 'Sarabun', sans-serif, Arial; }
 
-.top-bar { background-color: var(--hosp-orange-dark); color: #fff; font-size: 13px; padding: 7px 0; }
 
 /* ---------- ส่วนหัวของหน้า ---------- */
 .dept-page-header {
@@ -35,6 +34,8 @@ body { background-color: #f8f4f0; font-family: 'Sarabun', sans-serif, Arial; }
     transition: background 0.2s;
 }
 .btn-back:hover { background-color: #ffe8d6; color: var(--hosp-orange-dark); }
+
+.main-nav .nav-btn-back { align-self: center; margin: 8px 18px; }
 
 /* ==================== เมนูต้นไม้ด้านซ้าย ==================== */
 .dept-tree {
@@ -304,6 +305,12 @@ body { background-color: #f8f4f0; font-family: 'Sarabun', sans-serif, Arial; }
 }
 .main-nav .dropdown-item:last-child { border-bottom: none; }
 .main-nav .dropdown-item:hover { background-color: var(--hosp-orange-dark) !important; }
+.main-nav .dropdown-item.active,
+.main-nav .dropdown-item:active {
+    background-color: #ffffff !important;
+    color: var(--hosp-orange-dark) !important;
+    font-weight: 700;
+}
 
 /* Hover เปิด dropdown บน desktop (copy จาก index.css) */
 @media (min-width: 992px) {

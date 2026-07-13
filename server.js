@@ -12,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/news", require("./routes/news.routes"));
 app.use("/api/departments", require("./routes/departments.routes"));
 app.use("/api/banners", require("./routes/banners.routes"));
+app.use("/api/general-contents", require("./routes/general-contents.routes"));
 
 app.get("/", (req, res) => {
   res.json({ message: "Pakchong Nana Hospital API", status: "running" });

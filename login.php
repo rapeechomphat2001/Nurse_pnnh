@@ -1,37 +1,69 @@
 <?php
+require_once 'connect.php';
+
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$adminUsername = 'admin';
-$adminPasswordHash = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
 $redirectUrl = $_GET['redirect'] ?? 'admin.php';
 $loginError = false;
+$loginErrorMsg = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง';
 
+// ถ้า login แล้ว → ไปหน้า admin
 if (!empty($_SESSION['is_admin_logged_in'])) {
     header('Location: admin.php');
     exit;
 }
 
+// ตรวจรูปแบบ username/password แยกข้อความแจ้งเตือนตามสาเหตุ
+// $allowThai: true สำหรับ username (อนุญาตภาษาไทย), false สำหรับ password (อังกฤษ/ตัวเลขเท่านั้น)
+function validateLoginField($value, $label, $allowThai = false) {
+    if ($value === '') return "กรุณากรอก{$label}";
+    if (preg_match('/\s/u', $value)) return "{$label}ห้ามเว้นวรรค";
+    $pattern = $allowThai ? '/^[A-Za-z0-9\x{0E01}-\x{0E5B}]+$/u' : '/^[A-Za-z0-9]+$/';
+    if (!preg_match($pattern, $value)) return "{$label}ห้ามมีอักขระพิเศษ";
+    return null;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
+    $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    $passwordHash = hash('sha256', $password);
 
-    if ($username === $adminUsername && hash_equals($adminPasswordHash, $passwordHash)) {
-        $_SESSION['is_admin_logged_in'] = true;
-        $_SESSION['admin_username'] = $adminUsername;
+    $usernameError = validateLoginField($username, 'ชื่อผู้ใช้', true);
+    $passwordError = validateLoginField($password, 'รหัสผ่าน');
 
-        $redirectUrl = trim($redirectUrl);
-        if ($redirectUrl === '' || preg_match('/^(https?:)?\/\//i', $redirectUrl) || strpos($redirectUrl, 'login.php') !== false) {
-            $redirectUrl = 'admin.php';
+    if ($usernameError || $passwordError) {
+        $loginError = true;
+        $loginErrorMsg = $usernameError ?: $passwordError;
+    } else {
+        $passwordHash = hash('sha256', $password);
+
+        // ค้นหาผู้ใช้จากตาราง users
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
+        $stmt->execute([':username' => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && hash_equals($user['password_hash'], $passwordHash)) {
+            // เก็บข้อมูล session
+            $_SESSION['is_admin_logged_in'] = true;
+            $_SESSION['user_id']         = (int)$user['id'];
+            $_SESSION['username']        = $user['username'];
+            $_SESSION['role']            = $user['role'];               // 'main' หรือ 'dept'
+            $_SESSION['department_id']   = $user['department_id'] ? (int)$user['department_id'] : null;
+            $_SESSION['display_name']    = $user['display_name'] ?: $user['username'];
+
+            // ป้องกัน open-redirect
+            $redirectUrl = trim($redirectUrl);
+            if ($redirectUrl === '' || preg_match('/^(https?:)?\/\//i', $redirectUrl) || strpos($redirectUrl, 'login.php') !== false) {
+                $redirectUrl = 'admin.php';
+            }
+
+            header('Location: ' . $redirectUrl);
+            exit;
         }
 
-        header('Location: ' . $redirectUrl);
-        exit;
+        $loginError = true;
     }
-
-    $loginError = true;
 }
 ?>
 
@@ -42,6 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เข้าสู่ระบบผู้ดูแลระบบ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body class="bg-light">
@@ -53,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <?php if ($loginError): ?>
                     <div class="alert alert-danger" role="alert">
-                        ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
+                        <?= htmlspecialchars($loginErrorMsg) ?>
                     </div>
                 <?php endif; ?>
 

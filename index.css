@@ -262,6 +262,13 @@
     .ql-label        { font-size: 12px; }
 }
 
+@media (max-width: 575.98px) {
+    .dept-dropdown-menu { width: calc(100vw - 16px); column-gap: 18px; padding: 12px 14px !important; }
+    .dept-dropdown-menu .dropdown-item { font-size: 13px; padding: 8px 8px !important; }
+    .ev-thumb-img { height: 110px; }
+    .ql-card { padding: 16px 8px 12px; }
+}
+
 /* ==================== SCROLL TO TOP ==================== */
 
 #scrollTopBtn {
@@ -293,9 +300,3 @@
 }
 #scrollTopBtn:hover { background: var(--hosp-orange-dark); }
 
-@media (max-width: 575.98px) {
-    .dept-dropdown-menu { width: calc(100vw - 16px); column-gap: 18px; padding: 12px 14px !important; }
-    .dept-dropdown-menu .dropdown-item { font-size: 13px; padding: 8px 8px !important; }
-    .ev-thumb-img { height: 110px; }
-    .ql-card { padding: 16px 8px 12px; }
-}

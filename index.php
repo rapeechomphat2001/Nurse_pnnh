@@ -77,8 +77,8 @@ $news_list = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
 $stmt_depts = $conn->query("SELECT * FROM departments ORDER BY id ASC");
 $dept_list = $stmt_depts->fetchAll(PDO::FETCH_ASSOC);
 
-// ดึงข้อมูล Banner จาก MySQL
-$stmt_banners = $conn->query("SELECT * FROM banners WHERE is_active = 1 ORDER BY sort_order ASC, id ASC");
+// ดึงข้อมูล Banner จาก MySQL (เฉพาะ Banner หน้าแรก ไม่รวม Banner ประจำแผนก)
+$stmt_banners = $conn->query("SELECT * FROM banners WHERE is_active = 1 AND department_id IS NULL ORDER BY sort_order ASC, id ASC");
 $banner_list = $stmt_banners->fetchAll(PDO::FETCH_ASSOC);
 
 // Fallback ถ้าไม่มี Banner ในฐานข้อมูล
@@ -96,7 +96,6 @@ $fallback_banners = [
 ];
 $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -104,15 +103,37 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>กลุ่มงานการพยาบาล โรงพยาบาลปากช่องนานา</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="index.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        body.home-page {
+            padding-top: 180px;
+        }
+        #siteHeader {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2147483647;
+            width: 100%;
+            display: block;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        }
+    </style>
 </head>
-<body>
-
+<body class="home-page">
+<div id="siteHeader">
 <div class="top-bar">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div><i class="bi bi-telephone-fill"></i> สายด่วน: 044-316-999 ต่อ 4400 | <i class="bi bi-envelope-fill"></i> nursing@pkc.go.th</div>
+        <div><i class="bi bi-telephone-fill"></i> สายด่วน: 044-316-999 ต่อ 4400 &nbsp;|&nbsp; <i class="bi bi-envelope-fill"></i> nursing@pkc.go.th</div>
         <div class="d-flex align-items-center gap-2">
             <span id="liveClock">กำลังโหลดเวลา...</span>
             <a href="login.php" class="btn btn-sm btn-outline-light">เข้าสู่ระบบ</a>
@@ -122,8 +143,8 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
 
 <div class="header-banner">
     <div class="container d-flex align-items-center">
-        <div class="bg-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 65px;">
-            <i class="bi bi-hospital text-warning fs-3"></i>
+        <div class="me-3">
+            <img src="uploads/logo.png" alt="Logo" style="width: 65px; height: 70px; object-fit: contain;">
         </div>
         <div>
             <h2 class="mb-0 fw-bold">กลุ่มงานการพยาบาล</h2>
@@ -142,20 +163,8 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
                 <a class="nav-link active" href="#"><i class="bi bi-house-door-fill"></i> หน้าแรก</a>
 
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        เกี่ยวกับกลุ่มงาน
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye-fill me-2"></i> วิสัยทัศน์ / พันธกิจ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-diagram-3-fill me-2"></i> โครงสร้างองค์กร</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-people-fill me-2"></i> ทำเนียบผู้บริหาร</a></li>
-                        <li><a class="dropdown-item" href="service_profile.php"><i class="bi bi-file-earmark-person-fill me-2"></i> Service Profile</a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="deptDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        หอผู้ป่วย/หน่วยงาน
+                        <i class="bi bi-hospital-fill me-1"></i>หอผู้ป่วย/หน่วยงาน
                     </a>
                     <ul class="dropdown-menu dept-dropdown-menu" aria-labelledby="deptDropdown">
                         <?php if(empty($dept_list)): ?>
@@ -174,46 +183,75 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
                         <?php endif; ?>
                     </ul>
                 </div>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-building me-1"></i>เกี่ยวกับกลุ่มงาน</a>
+                    <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+                        <li><a class="dropdown-item" href="vision_mission.php"><i class="bi bi-eye-fill me-2"></i> วิสัยทัศน์ / พันธกิจ</a></li>
+                        <li><a class="dropdown-item" href="nurse_roster.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบพยาบาล</a></li>
+                        <li><a class="dropdown-item" href="executives.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบหัวหน้ากลุ่มงาน</a></li>
+                        <li><a class="dropdown-item" href="ward_heads.php"><i class="bi bi-people-fill me-2"></i> ทำเนียบหัวหน้างาน</a></li>
+                    </ul>
+                </div>
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        งานบริหาร
-                    </a>
+                    <i class="bi bi-briefcase-fill me-1"></i>งานบริหาร</a>
                     <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <li><a class="dropdown-item" href="#">แผนงาน / โครงงาน</a></li>
-                        <li><a class="dropdown-item" href="#">ระเบียบ / ข้อบังคับ</a></li>
-                        <li><a class="dropdown-item" href="#">ข้อมูลงานบริหาร</a></li>
+                        <li><a class="dropdown-item" href="org_structure.php"><i class="bi bi-diagram-3 me-2"></i>โครงสร้างบริหาร</a></li>
+                        <li><a class="dropdown-item" href="regulations.php"><i class="bi bi-book me-2"></i>คู่มือบริหาร</a></li>
+                        <li><a class="dropdown-item" href="plans_projects.php"><i class="bi bi-bullseye me-2"></i>แผนยุทธศาสตร์การพยาบาล</a></li>
+                        <li><a class="dropdown-item" href="staff_dev_plan.php"><i class="bi bi-person-workspace me-2"></i>แผนพัฒนาบุคลากร</a></li>
+                        <li><a class="dropdown-item" href="risk_management.php"><i class="bi bi-shield-check me-2"></i>บริหารความเสี่ยง</a></li>
+                        <li><a class="dropdown-item" href="nursing_ethics.php"><i class="bi bi-heart-pulse me-2"></i>จริยธรรมทางการพยาบาล</a></li>
                     </ul>
                 </div>
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        งานวิชาการ
-                    </a>
+                    <i class="bi bi-mortarboard-fill me-1"></i>งานวิชาการ</a>
                     <ul class="dropdown-menu" aria-labelledby="academicDropdown">
-                        <li><a class="dropdown-item" href="#">คลังความรู้ / KM</a></li>
-                        <li><a class="dropdown-item" href="#">แนวปฎิบัติการพยาบาล (CPG)</a></li>
-                        <li><a class="dropdown-item" href="#">งานวิจัย / R2R</a></li>
-                        <li><a class="dropdown-item" href="#">อบรม / สัมมนา</a></li>
+                        <li><a class="dropdown-item" href="dataset.php"><i class="bi bi-database me-2"></i> Data set</a></li>
+                        <li><a class="dropdown-item" href="downloads.php"><i class="bi bi-file-earmark-arrow-down me-2"></i> เอกสารดาวน์โหลด</a></li>
                     </ul>
                 </div>
 
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="qualityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        คุณภาพการพยาบาล
-                    </a>
+                     <i class="bi bi-star-fill me-1"></i>คุณภาพการพยาบาล</a>
                     <ul class="dropdown-menu" aria-labelledby="qualityDropdown">
-                        <li><a class="dropdown-item" href="#">ตัวชี้วัดคุณภาพ (KPI)</a></li>
-                        <li><a class="dropdown-item" href="#">Patient Safety</a></li>
-                        <li><a class="dropdown-item" href="#">IC / การป้องกันการติดเชื้อ</a></li>
+                        <li><a class="dropdown-item" href="kpi.php"><i class="bi bi-graph-up-arrow me-2"></i> ตัวชี้วัดคุณภาพ</a></li>
+                        <li><a class="dropdown-item" href="service_profile.php"><i class="bi bi-file-medical me-2"></i> Service profile</a></li>
+                        <li><a class="dropdown-item" href="cpg.php"><i class="bi bi-journal-medical me-2"></i> CNPG</a></li>
+                        <li><a class="dropdown-item" href="wi.php"><i class="bi bi-file-earmark-text me-2"></i> WI</a></li>
+                        <li><a class="dropdown-item" href="research.php"><i class="bi bi-search-heart me-2"></i> วิจัย</a></li>
                     </ul>
                 </div>
 
-                <a class="nav-link" href="#">ติดต่อเรา</a>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="informationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                     <i class="bi bi-lightbulb-fill me-1"></i>งานสารสนเทศ</a>
+                    <ul class="dropdown-menu" aria-labelledby="informationDropdown">
+                        <li><a class="dropdown-item" href="staffing.php"><i class="bi bi-people-fill me-2"></i> อัตรากำลัง</a></li>
+                        <li><a class="dropdown-item" href="workload.php"><i class="bi bi-bar-chart-line me-2"></i> ภาระงาน</a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell-fill me-1"></i>ข่าวประชาสัมพันธ์</a>
+                    <ul class="dropdown-menu" aria-labelledby="newsDropdown">
+                        <li><a class="dropdown-item" href="all_news.php"><i class="bi bi-newspaper me-2"></i> ข่าวสาร</a></li>
+                        <li><a class="dropdown-item" href="meeting_reports.php"><i class="bi bi-file-earmark-text me-2"></i> รายงานการประชุม</a></li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </div>
 </nav>
+</div>
+
 
 <!-- ==================== HERO CAROUSEL (ดึงจากตาราง banners) ==================== -->
 <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
@@ -267,91 +305,23 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
     </div>
 </div>
 
-<div class="stat-box-container text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3 col-6 border-end">
-                <div class="stat-number">422</div>
-                <div class="stat-label"><i class="bi bi-person-fill"></i> บุคลากรพยาบาล (คน)</div>
-            </div>
-            <div class="col-md-3 col-6 border-end">
-                <div class="stat-number">380</div>
-                <div class="stat-label"><i class="bi bi-door-open-fill"></i> เตียงผู้ป่วย (เตียง)</div>
-            </div>
-            <div class="col-md-3 col-6 border-end">
-                <div class="stat-number">18</div>
-                <div class="stat-label"><i class="bi bi-building-fill"></i> หน่วยงาน</div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-number">24</div>
-                <div class="stat-label"><i class="bi bi-clock-fill"></i> ชั่วโมง พร้อมให้บริการ</div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="container my-4">
-    <div class="row g-4">
-
-        <!-- ข่าวประชาสัมพันธ์ -->
-        <div class="col-lg-9 col-md-12">
-            <div class="block-header">
-                <span><i class="bi bi-megaphone-fill"></i> ข่าวประชาสัมพันธ์</span>
-                <a href="all_news.php">ดูทั้งหมด ›</a>
+    <div class="row">
+        <div class="col-12">
+            <div class="block-header mb-3">
+                <span class="fs-5 fw-bold"><i class="bi bi-calendar-event-fill"></i>ตารางปฏิบัติงาน</span>
             </div>
-            <div class="border p-2 bg-white" style="border-top: none; min-height: 380px;">
-                <?php if(empty($news_list)): ?>
-                    <div class="text-muted text-center py-4">ไม่มีข้อมูลข่าวประชาสัมพันธ์</div>
-                <?php else: ?>
-                    <?php foreach($news_list as $news):
-                        $news_file = !empty($news['image_name']) ? $news['image_name'] : 'default.jpg';
-                    ?>
-                    <div class="news-item-row d-flex justify-content-between align-items-start gap-3">
-                        <div class="flex-grow-1">
-                            <i class="bi bi-chevron-right small me-1" style="color: var(--hosp-orange) !important;"></i>
-                            <a href="news_detail.php?id=<?= (int)$news['id'] ?>" class="text-decoration-none align-middle">
-                                <?= htmlspecialchars($news['title']) ?>
-                            </a>
-                            <?php if(isset($news['is_new']) && (int)$news['is_new'] === 1): ?>
-                                <span class="badge-new ms-1 align-middle"><i class="bi bi-stars me-1"></i> ใหม่</span>
-                            <?php endif; ?>
-                        </div>
-                        <span class="text-muted small text-end flex-shrink-0 pt-1" style="width: 75px; font-weight: 500;"><?= dateToThaiShort($news['created_at']) ?></span>
-                    </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+            <!-- กล่องสำหรับแสดงผล AppSheet -->
+            <div class="border rounded bg-white shadow-sm overflow-hidden mb-4" style="height: 600px;">
+                <iframe 
+                    src="https://calendar.google.com/calendar/embed?src=c_9ac506c7372c44aec4f67376f73f952e35c158cf08222472e750f8ce147b33d7%40group.calendar.google.com&ctz=Asia%2FBangkok" 
+                    width="100%" 
+                    height="100%" 
+                    style="border: none;" 
+                    allowfullscreen>
+                </iframe>
             </div>
         </div>
-
-        <!-- หอผู้ป่วย / หน่วยงาน -->
-        <div class="col-lg-3 col-md-12">
-            <div class="block-header">
-                <span><i class="bi bi-building-fill"></i> หอผู้ป่วย / หน่วยงาน</span>
-            </div>
-            <div class="dept-list-box" style="min-height: 380px;">
-                <div class="row g-0">
-                    <?php if(empty($dept_list)): ?>
-                        <div class="text-muted text-center py-4 w-100">ไม่มีข้อมูลหน่วยงาน</div>
-                    <?php else: ?>
-                        <?php
-                        $half   = ceil(count($dept_list) / 2);
-                        $chunks = array_chunk($dept_list, $half);
-                        foreach($chunks as $chunk): ?>
-                            <div class="col-6 px-2">
-                                <?php foreach($chunk as $dept): ?>
-                                    <?php $deptUrl = !empty($dept['link_url']) ? $dept['link_url'] : 'department.php?id=' . (int)$dept['id']; ?>
-                                    <div class="dept-link-node text-truncate">
-                                        <i class="bi bi-chevron-right small" style="color: var(--hosp-orange) !important;"></i>
-                                        <a href="<?= htmlspecialchars($deptUrl) ?>"><?= htmlspecialchars($dept['name']) ?></a>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
 
@@ -364,14 +334,14 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
             <div class="link-grid-box mb-4">
                 <div class="row g-0">
                     <div class="col-6 border-end">
-                        <div class="link-grid-item"><i class="bi bi-shield-check text-warning me-2"></i><a href="https://www.tnmc.or.th/">สภาการพยาบาล</a></div>
-                        <div class="link-grid-item"><i class="bi bi-mortarboard-fill text-warning me-2"></i><a href="https://cpg.dms.go.th/" >ระบบสืบค้น CPG</a></div>
-                        <div class="link-grid-item"><i class="bi bi-tablet-landscape text-warning me-2"></i><a href="https://www.ckdoctor.com/?gad_source=1&gad_campaignid=21980229015&gbraid=0AAAAAD1H3YMu4xNuCAv4r1kzu7EDC09jH&gclid=Cj0KCQjwr4jSBhCSARIsAOX1E-IiNEXscz-aLco7ZjmCCFGS4J8SUO5D9ZsC95fT6HW7KfrGGNjY8HgaAt8tEALw_wcB">ระบบ HIS</a></div>
+                        <div class="link-grid-item"><i class="bi bi-shield-check text-warning me-2"></i><a href="https://www.tnmc.or.th/" target="_blank" rel="noopener noreferrer">สภาการพยาบาล</a></div>
+                        <div class="link-grid-item"><i class="bi bi-mortarboard-fill text-warning me-2"></i><a href="https://cpg.dms.go.th/" target="_blank" rel="noopener noreferrer">ระบบสืบค้น CPG</a></div>
+                        <div class="link-grid-item"><i class="bi bi-tablet-landscape text-warning me-2"></i><a href="https://www.ckdoctor.com/?gad_source=1&gad_campaignid=21980229015&gbraid=0AAAAAD1H3YMu4xNuCAv4r1kzu7EDC09jH&gclid=Cj0KCQjwr4jSBhCSARIsAOX1E-IiNEXscz-aLco7ZjmCCFGS4J8SUO5D9ZsC95fT6HW7KfrGGNjY8HgaAt8tEALw_wcB" target="_blank" rel="noopener noreferrer">ระบบ HIS</a></div>
                     </div>
                     <div class="col-6">
-                        <div class="link-grid-item"><i class="bi bi-heart-pulse-fill text-danger me-2"></i><a href="https://www.dms.go.th/?StartWeb=1">กรมการแพทย์</a></div>
-                        <div class="link-grid-item"><i class="bi bi-bar-chart-line-fill text-warning me-2"></i><a href="https://spd.moph.go.th/kpi-template-%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%8A%E0%B8%B5%E0%B9%89%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%81%E0%B8%A3%E0%B8%B0%E0%B8%97%E0%B8%A3%E0%B8%A7%E0%B8%87%E0%B8%AA%E0%B8%B2%E0%B8%98%E0%B8%B2/" >รายงาน KPI</a></div>
-                        <div class="link-grid-item"><i class="bi bi-file-earmark-medical-fill text-warning me-2"></i><a href="https://intranet.dla.go.th/km/km.do">คลังความรู้ KM</a></div>
+                        <div class="link-grid-item"><i class="bi bi-heart-pulse-fill text-danger me-2"></i><a href="https://www.dms.go.th/?StartWeb=1" target="_blank" rel="noopener noreferrer">กรมการแพทย์</a></div>
+                        <div class="link-grid-item"><i class="bi bi-bar-chart-line-fill text-warning me-2"></i><a href="https://spd.moph.go.th/kpi-template-%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%8A%E0%B8%B5%E0%B9%89%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%81%E0%B8%A3%E0%B8%B0%E0%B8%97%E0%B8%A3%E0%B8%A7%E0%B8%87%E0%B8%AA%E0%B8%B2%E0%B8%98%E0%B8%B2/" target="_blank" rel="noopener noreferrer">รายงาน KPI</a></div>
+                        <div class="link-grid-item"><i class="bi bi-file-earmark-medical-fill text-warning me-2"></i><a href="https://intranet.dla.go.th/km/km.do" target="_blank" rel="noopener noreferrer">คลังความรู้ KM</a></div>
                     </div>
                 </div>
             </div>
@@ -395,6 +365,7 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
     </div>
 </div>
 
+
 <footer class="main-footer">
     <div class="container">
         <div class="row g-4">
@@ -414,10 +385,10 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
             <div class="col-md-4">
                 <h5><i class="bi bi-link-45deg"></i> ลิงก์ที่เกี่ยวข้อง</h5>
                 <ul class="small opacity-80">
-                    <li><i class="bi bi-chevron-right"></i> <a href="https://moph.go.th/">กระทรวงสาธารณสุข</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.tnmc.or.th/">สภาการพยาบาล</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.dms.go.th/?StartWeb=1">กรมการแพทย์</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.ha.or.th/TH/Home/%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81">สรพ. (HA)</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://moph.go.th/" target="_blank" rel="noopener noreferrer">กระทรวงสาธารณสุข</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.tnmc.or.th/" target="_blank" rel="noopener noreferrer">สภาการพยาบาล</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.dms.go.th/?StartWeb=1" target="_blank" rel="noopener noreferrer">กรมการแพทย์</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.ha.or.th/TH/Home/%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81" target="_blank" rel="noopener noreferrer">สรพ. (HA)</a></li>
                 </ul>
             </div>
         </div>
@@ -453,25 +424,6 @@ window.addEventListener('scroll', function() {
     document.getElementById('scrollTopBtn').classList.toggle('show', window.scrollY > 300);
 }, { passive: true });
 
-// Sticky navbar (workaround for overflow-x:hidden on body)
-(function() {
-    const nav = document.getElementById('mainNav');
-    if (!nav) return;
-    const navTop = nav.getBoundingClientRect().top + window.scrollY;
-    const navH   = nav.offsetHeight;
-
-    function handleScroll() {
-        if (window.scrollY >= navTop) {
-            nav.style.cssText = 'position:fixed;top:0;left:0;right:0;width:100%;z-index:1040;';
-            document.body.style.paddingTop = navH + 'px';
-        } else {
-            nav.style.cssText = '';
-            document.body.style.paddingTop = '';
-        }
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-})();
 </script>
 
 <button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="กลับด้านบน">
