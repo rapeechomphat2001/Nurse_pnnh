@@ -164,24 +164,23 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
             <div class="navbar-nav">
                 <a class="nav-link active" href="#"><i class="bi bi-house-door-fill"></i> หน้าแรก</a>
 
-                <div class="nav-item dropdown dept-mega-item">
+                <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="deptDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-hospital-fill me-1"></i>หอผู้ป่วย/หน่วยงาน
                     </a>
-                    <div class="dropdown-menu dept-mega-menu" aria-labelledby="deptDropdown">
+                    <ul class="dropdown-menu dept-dropdown-menu" aria-labelledby="deptDropdown">
                         <?php if(empty($dept_list)): ?>
-                            <p class="text-white m-0">ไม่พบข้อมูล</p>
+                            <li><span class="dropdown-item text-white">ไม่พบข้อมูล</span></li>
                         <?php else: ?>
                             <?php foreach($dept_list as $dept):
-                                $shortName = str_replace(['งาน', 'หน่วยงาน'], '', $dept['name']);
                                 $deptUrl = !empty($dept['link_url']) ? $dept['link_url'] : 'department.php?id=' . (int)$dept['id'];
                             ?>
-                            <a href="<?= htmlspecialchars($deptUrl) ?>" class="dept-mega-link">
-                                <?= htmlspecialchars(trim($shortName)) ?>
-                            </a>
+                            <li><a class="dropdown-item" href="<?= htmlspecialchars($deptUrl) ?>">
+                                <?= htmlspecialchars($dept['name']) ?>
+                            </a></li>
                             <?php endforeach; ?>
                         <?php endif; ?>
-                    </div>
+                    </ul>
                 </div>
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
