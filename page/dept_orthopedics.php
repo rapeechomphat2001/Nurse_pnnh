@@ -59,8 +59,8 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                         <i class="bi bi-building me-1"></i>เกี่ยวกับกลุ่มงาน
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                        <li><a class="dropdown-item" href="executives.php"><i class="bi bi-person-badge-fill me-2"></i> ทำเนียบหัวหน้ากลุ่มงาน</a></li>
-                        <li><a class="dropdown-item" href="personnel_gallery.php"><i class="bi bi-people-fill me-2"></i> รูปบุคลากร</a></li>
+                        <li><a class="dropdown-item" href="executives.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-person-badge-fill me-2"></i> ทำเนียบหัวหน้ากลุ่มงาน</a></li>
+                        <li><a class="dropdown-item" href="personnel_gallery.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-people-fill me-2"></i> รูปบุคลากร</a></li>
                     </ul>
                 </div>
 
@@ -69,9 +69,9 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                         <i class="bi bi-briefcase-fill me-1"></i>งานบริหาร
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <li><a class="dropdown-item" href="org_structure.php"><i class="bi bi-diagram-3-fill me-2"></i> โครงสร้างบริหาร</a></li>
-                        <li><a class="dropdown-item" href="risk_management.php"><i class="bi bi-shield-exclamation me-2"></i> บริหารความเสี่ยง</a></li>
-                        <li><a class="dropdown-item" href="nursing_ethics.php"><i class="bi bi-patch-check-fill me-2"></i> จริยธรรมการพยาบาล</a></li>
+                        <li><a class="dropdown-item" href="org_structure.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-diagram-3-fill me-2"></i> โครงสร้างบริหาร</a></li>
+                        <li><a class="dropdown-item" href="risk_management.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-shield-exclamation me-2"></i> บริหารความเสี่ยง</a></li>
+                        <li><a class="dropdown-item" href="nursing_ethics.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-patch-check-fill me-2"></i> จริยธรรมการพยาบาล</a></li>
                     </ul>
                 </div>
 
@@ -80,7 +80,7 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                         <i class="bi bi-clipboard2-check-fill me-1"></i>งานบริการ
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="serviceDropdown">
-                        <li><a class="dropdown-item" href="supervision_results.php"><i class="bi bi-clipboard-check me-2"></i> ผลการนิเทศ</a></li>
+                        <li><a class="dropdown-item" href="supervision_results.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-clipboard-check me-2"></i> ผลการนิเทศ</a></li>
                     </ul>
                 </div>
 
@@ -89,7 +89,7 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                         <i class="bi bi-mortarboard-fill me-1"></i>งานวิชาการ
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="academicDropdown">
-                        <li><a class="dropdown-item" href="dataset.php"><i class="bi bi-database-fill me-2"></i> Data set</a></li>
+                        <li><a class="dropdown-item" href="dataset.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-database-fill me-2"></i> Data set</a></li>
                     </ul>
                 </div>
 
@@ -98,11 +98,11 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                         <i class="bi bi-star-fill me-1"></i>คุณภาพทางการพยาบาล
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="qualityDropdown">
-                        <li><a class="dropdown-item" href="kpi.php"><i class="bi bi-bar-chart-fill me-2"></i> ตัวชี้วัดคุณภาพ</a></li>
-                        <li><a class="dropdown-item" href="service_profile.php"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
+                        <li><a class="dropdown-item" href="kpi.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-bar-chart-fill me-2"></i> ตัวชี้วัดคุณภาพ</a></li>
+                        <li><a class="dropdown-item" href="service_profile.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
                         <li><a class="dropdown-item" href="cpg.php"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
-                        <li><a class="dropdown-item" href="wi.php"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
-                        <li><a class="dropdown-item" href="research.php"><i class="bi bi-search me-2"></i> วิจัย</a></li>
+                        <li><a class="dropdown-item" href="wi.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
+                        <li><a class="dropdown-item" href="research.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-search me-2"></i> วิจัย</a></li>
                     </ul>
                 </div>
 
@@ -111,8 +111,8 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                         <i class="bi bi-lightbulb-fill me-1"></i>งานสารสนเทศ
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="infoDropdown">
-                        <li><a class="dropdown-item" href="staffing.php"><i class="bi bi-diagram-2-fill me-2"></i> อัตรากำลัง</a></li>
-                        <li><a class="dropdown-item" href="workload.php"><i class="bi bi-speedometer2 me-2"></i> ภาระงาน</a></li>
+                        <li><a class="dropdown-item" href="staffing.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-diagram-2-fill me-2"></i> อัตรากำลัง</a></li>
+                        <li><a class="dropdown-item" href="workload.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-speedometer2 me-2"></i> ภาระงาน</a></li>
                     </ul>
                 </div>
 
@@ -122,7 +122,7 @@ $DEPT_NAME = 'ศัลยกรรมกระดูกและข้อ';
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="newsDropdown">
                         <li><a class="dropdown-item active" href="<?= basename($_SERVER['PHP_SELF']) ?>"><i class="bi bi-megaphone-fill me-2"></i> ข่าวสารของแผนก</a></li>
-                        <li><a class="dropdown-item" href="meeting_reports.php"><i class="bi bi-journal-text me-2"></i> รายงานการประชุม</a></li>
+                        <li><a class="dropdown-item" href="meeting_reports.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-journal-text me-2"></i> รายงานการประชุม</a></li>
                     </ul>
                 </div>
                 <a href="index.php" class="btn-back nav-btn-back ms-auto"><i class="bi bi-arrow-left-circle-fill"></i> กลับหน้าหลัก</a>
