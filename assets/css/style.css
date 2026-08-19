@@ -109,7 +109,7 @@ body {
 }
 
 /* Bootstrap Carousel Slider */
-.carousel-item {
+#heroCarousel .carousel-item {
     height: 420px;
     background: linear-gradient(135deg, var(--hosp-orange-dark) 0%, var(--hosp-orange) 60%, #e8a87c 100%);
     background-size: cover;
@@ -433,7 +433,7 @@ img {
         padding: 12px 14px !important;
     }
 
-    .carousel-item {
+    #heroCarousel .carousel-item {
         height: 340px;
         background-position: center center;
     }
@@ -495,7 +495,7 @@ img {
         line-height: 1.35;
     }
 
-    .carousel-item {
+    #heroCarousel .carousel-item {
         height: 300px;
     }
 
@@ -624,7 +624,7 @@ img {
         column-count: 1;
     }
 
-    .carousel-item {
+    #heroCarousel .carousel-item {
         height: 270px;
     }
 
