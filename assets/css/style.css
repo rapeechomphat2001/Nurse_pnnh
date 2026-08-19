@@ -56,6 +56,58 @@ body {
     color: var(--hosp-orange-dark) !important;
 }
 
+/* ===== Mega Menu — หอผู้ป่วย/หน่วยงาน ===== */
+.dept-mega-link {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 14px;
+    font-size: .9rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background .15s;
+    word-break: break-word;
+}
+.dept-mega-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+
+.dept-mega-menu {
+    display: none;
+    position: static !important;
+    float: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    box-sizing: border-box;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    background-color: var(--hosp-orange) !important;
+}
+.dept-mega-menu.show { display: grid !important; }
+
+@media (max-width: 480px) {
+    .dept-mega-menu { grid-template-columns: 1fr !important; }
+    .dept-mega-link  { padding: 8px 10px; font-size: .85rem; }
+}
+@media (min-width: 1200px) {
+    .dept-mega-item { position: static !important; }
+    .dept-mega-menu {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 0 !important;
+        padding: 20px 30px !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        border-radius: 0 0 8px 8px !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,.25) !important;
+    }
+    .dept-mega-item:hover .dept-mega-menu { display: grid !important; }
+}
+
 /* Bootstrap Carousel Slider */
 .carousel-item {
     height: 420px;

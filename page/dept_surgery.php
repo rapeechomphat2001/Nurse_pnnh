@@ -35,10 +35,10 @@ $DEPT_NAME = 'ศัลยกรรม';
 <div class="header-banner">
     <div class="container d-flex align-items-center">
         <div class="me-3">
-            <img src="uploads/logo.png" alt="Logo" style="width: 65px; height: 70px; object-fit: contain;">
+            <img src="../uploads/logo.png" alt="Logo" style="width: 65px; height: 70px; object-fit: contain;">
         </div>
         <div>
-            <h2 class="mb-0 fw-bold">กลุ่มงานการพยาบาล <span class="fw-normal opacity-90">· <?= htmlspecialchars($DEPT_NAME) ?></span></h2>
+            <h2 class="mb-0 fw-bold">กลุ่มงานการพยาบาล <span class="fw-normal opacity-90"><?= htmlspecialchars($DEPT_NAME) ?></span></h2>
             <div class="small opacity-90">โรงพยาบาลปากช่องนานา | Nursing Department, Pakchong Nana Hospital</div>
         </div>
     </div>
