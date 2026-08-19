@@ -66,14 +66,27 @@ function parseFileNames($fileData) {
 // สร้าง <option> ของ dropdown "หมวดข้อมูล" — รวมหมวดของ "กลุ่มงาน/หน้าหลักที่เลือกไว้ด้านบน" (primary) + หน้าเนื้อหาทั่วไป (24 หน้า) ไว้ในที่เดียว
 // $primary_sections/$primary_label = หมวดของแผนก (8 หมวด) หรือหมวดของหน้าหลัก (6 หมวด) แล้วแต่ว่า dropdown "กลุ่มงาน" ด้านบนเลือกอะไรไว้
 // $include_all_option = false เมื่อใช้กับฟอร์ม "เพิ่มข้อมูล" (ต้องเลือกหมวดจริงเสมอ ไม่มี "ทั้งหมด")
-function renderSectionOptions($primary_sections, $primary_label, $general_content_sections, $selected_dept_section, $selected_is_general, $selected_general_slug, $is_main_admin, $include_all_option = true) {
+function renderSectionOptions($primary_groups, $primary_label, $general_content_sections, $selected_dept_section, $selected_is_general, $selected_general_slug, $is_main_admin, $include_all_option = true) {
     $html = $include_all_option ? '<option value="">— ทั้งหมดของแผนกนี้ —</option>' : '';
-    $html .= '<optgroup label="' . htmlspecialchars($primary_label) . '">';
-    foreach ($primary_sections as $key => $label) {
-        $sel = ($selected_dept_section === $key) ? 'selected' : '';
-        $html .= '<option value="' . htmlspecialchars($key) . '" ' . $sel . '>' . htmlspecialchars($label) . '</option>';
+    // รองรับทั้ง nested array (grouped) และ flat array (legacy)
+    $isGrouped = is_array(reset($primary_groups));
+    if ($isGrouped) {
+        foreach ($primary_groups as $groupName => $items) {
+            $html .= '<optgroup label="' . htmlspecialchars($groupName) . '">';
+            foreach ($items as $key => $label) {
+                $sel = ($selected_dept_section === $key) ? 'selected' : '';
+                $html .= '<option value="' . htmlspecialchars($key) . '" ' . $sel . '>' . htmlspecialchars($label) . '</option>';
+            }
+            $html .= '</optgroup>';
+        }
+    } else {
+        $html .= '<optgroup label="' . htmlspecialchars($primary_label) . '">';
+        foreach ($primary_groups as $key => $label) {
+            $sel = ($selected_dept_section === $key) ? 'selected' : '';
+            $html .= '<option value="' . htmlspecialchars($key) . '" ' . $sel . '>' . htmlspecialchars($label) . '</option>';
+        }
+        $html .= '</optgroup>';
     }
-    $html .= '</optgroup>';
     if ($is_main_admin) {
         $html .= '<optgroup label="หน้าเนื้อหาทั่วไป">';
         foreach ($general_content_sections as $slug => $label) {
@@ -85,26 +98,43 @@ function renderSectionOptions($primary_sections, $primary_label, $general_conten
     return $html;
 }
 
-$department_content_sections = [
-    'knowledge'           => 'ข่าวสารของแผนก',
-    'structure'           => 'โครงสร้างการบริหารงาน',
-    'executives'          => 'ทำเนียบหัวหน้ากลุ่มงาน',
-    'ward_heads'          => 'ทำเนียบหัวหน้างาน',
-    'service_profile'     => 'Service Profile',
-    'kpi'                 => 'ตัวชี้วัดคุณภาพ',
-    'research'            => 'วิจัย/CQI',
-    'wi'                  => 'WI',
-    'cpg'                 => 'CNPG',
-    'risk_management'     => 'บริหารความเสี่ยง',
-    'nursing_ethics'      => 'จริยธรรมการพยาบาล',
-    'supervision_results' => 'ผลการนิเทศ',
-    'dataset'             => 'Data Set',
-    'staffing'            => 'อัตรากำลัง',
-    'workload'            => 'ภาระงาน',
-    'dashboard'           => 'Dashbord',
-    'meeting_reports'     => 'รายงานการประชุม',
-    'personnel_gallery'   => 'รูปบุคลากร',
+// กลุ่มหมวดของแผนก — จัดกลุ่มตามเมนู index.php
+$department_section_groups = [
+    'เกี่ยวกับกลุ่มงาน' => [
+        'executives'          => 'ทำเนียบหัวหน้ากลุ่มงาน',
+        'ward_heads'          => 'ทำเนียบหัวหน้างาน',
+        'personnel_gallery'   => 'รูปบุคลากร',
+    ],
+    'งานบริหาร' => [
+        'structure'           => 'โครงสร้างการบริหาร',
+        'risk_management'     => 'บริหารความเสี่ยง',
+        'nursing_ethics'      => 'จริยธรรมการพยาบาล',
+    ],
+    'งานบริการ' => [
+        'supervision_results' => 'ผลการนิเทศ',
+    ],
+    'งานวิชาการ' => [
+        'dataset'             => 'Data Set',
+    ],
+    'คุณภาพการพยาบาล' => [
+        'kpi'                 => 'ตัวชี้วัดคุณภาพ',
+        'service_profile'     => 'Service Profile',
+        'cpg'                 => 'CNPG',
+        'wi'                  => 'WI',
+        'research'            => 'วิจัย/CQI',
+    ],
+    'งานสารสนเทศ' => [
+        'staffing'            => 'อัตรากำลัง',
+        'workload'            => 'ภาระงาน',
+        'dashboard'           => 'Dashbord',
+    ],
+    'ข่าวประชาสัมพันธ์' => [
+        'knowledge'           => 'ข่าวสารของแผนก',
+        'meeting_reports'     => 'รายงานการประชุม',
+    ],
 ];
+// Flatten สำหรับ validation/lookup ที่ใช้ทั่วไฟล์
+$department_content_sections = array_merge(...array_values($department_section_groups));
 
 // หมวดเนื้อหา "ทั่วไป" (ไม่ผูกกับแผนก) — 1 หมวด ต่อ 1 หน้าเว็บกลางขององค์กร (key = ชื่อไฟล์ไม่รวม .php)
 $general_content_sections = [
@@ -188,7 +218,7 @@ $index_page_groups = [
         'idx_service_profile' => 'Service profile',
         'idx_cpg'             => 'CNPG',
         'idx_wi'              => 'WI',
-        'idx_research'        => 'วิจัย',
+        'idx_research'        => 'วิจัย/CQI',
     ],
     'งานสารสนเทศ' => [
         'idx_staffing'  => 'อัตรากำลัง',
@@ -1114,7 +1144,7 @@ if ($active_tab == 'index_page') {
                         <label class="form-label fw-bold">หมวดข้อมูล</label>
                         <select name="section" class="form-select" onchange="this.form.submit()">
                             <?php /* แท็บนี้จัดการเฉพาะข้อมูลของแผนกที่เลือกเท่านั้น — หมวด "ทั่วไป/ทั้งองค์กร" ต้องไปจัดการผ่านแท็บ "หน้าหลัก (Index)" แยกกันไปเลย ไม่ปนกัน */ ?>
-                            <?= renderSectionOptions($department_content_sections, 'หมวดของแผนก', $general_content_sections, $selected_dept_section, $selected_is_general, $selected_general_slug, false) ?>
+                            <?= renderSectionOptions($department_section_groups, 'หมวดของแผนก', $general_content_sections, $selected_dept_section, $selected_is_general, $selected_general_slug, false) ?>
                         </select>
                     </div>
                 </form>
@@ -1147,7 +1177,7 @@ if ($active_tab == 'index_page') {
                         <div class="col-md-12">
                             <label class="form-label fw-bold">หมวดข้อมูล</label>
                             <select name="section" class="form-select" onchange="this.form.submit()">
-                                <?= renderSectionOptions($department_content_sections, 'หมวดของแผนก', $general_content_sections, $selected_dept_section, $selected_is_general, $selected_general_slug, $is_main_admin) ?>
+                                <?= renderSectionOptions($department_section_groups, 'หมวดของแผนก', $general_content_sections, $selected_dept_section, $selected_is_general, $selected_general_slug, $is_main_admin) ?>
                             </select>
                         </div>
                     </form>
