@@ -287,9 +287,6 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
         <div class="carousel-item <?= $isActive ?>" style="<?= $bgStyle ?>">
             <div class="carousel-overlay"></div>
             <div class="carousel-caption-custom">
-                <?php if(!empty($slide['title'])): ?>
-                    <h1 class="mb-2"><?= htmlspecialchars($slide['title']) ?></h1>
-                <?php endif; ?>
                 <?php if(!empty($slide_sub)): ?>
                     <p class="mb-4" style="font-size: 16px; opacity: 0.95;"><?= $slide_sub ?></p>
                 <?php endif; ?>

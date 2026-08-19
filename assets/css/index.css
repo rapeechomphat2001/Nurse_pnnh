@@ -25,6 +25,8 @@
 .dept-dropdown-menu {
     width: 460px;
     max-width: calc(100vw - 24px);
+    max-height: 60vh;
+    overflow-y: auto;
     padding: 18px 22px !important;
     column-count: 2;
     column-gap: 42px;
