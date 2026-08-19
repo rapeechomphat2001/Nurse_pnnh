@@ -169,7 +169,6 @@ $index_page_groups = [
         'idx_nurse_roster'   => 'ทำเนียบหัวหน้าพยาบาล',
         'idx_executives'     => 'ทำเนียบหัวหน้ากลุ่มงาน',
         'idx_ward_heads'     => 'ทำเนียบหัวหน้างาน',
-        'idx_personnel_gallery' => 'รูปบุคลากร',
     ],
     'งานบริหาร' => [
         'idx_org_structure'   => 'โครงสร้างบริหาร',
