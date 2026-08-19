@@ -103,7 +103,7 @@ $DEPT_NAME = 'OPD';
                         <li><a class="dropdown-item" href="service_profile.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
                         <li><a class="dropdown-item" href="cpg.php"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
                         <li><a class="dropdown-item" href="wi.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
-                        <li><a class="dropdown-item" href="research.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-search me-2"></i> วิจัย</a></li>
+                        <li><a class="dropdown-item" href="research.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-search me-2"></i> วิจัย/CQI</a></li>
                     </ul>
                 </div>
 

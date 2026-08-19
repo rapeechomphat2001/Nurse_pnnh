@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // =====================================================================
 //  กุมารเวช — หน้าหอผู้ป่วย/หน่วยงาน (เวอร์ชันปรับขนาดมีเดียและเมนูตามหน้าเดโมจริง)
 //  ดึงข้อมูลจากตาราง department_contents โดยอ้างอิง department_id = 1
@@ -217,7 +217,7 @@ $gc_rows = $conn->query("SELECT * FROM department_contents WHERE department_id I
                         <li><a class="dropdown-item" href="<?= isset($DEPT_ID) ? 'service_profile.php?id=' . (int)$DEPT_ID : 'service_profile.php' ?>"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
                         <li><a class="dropdown-item" href="<?= isset($DEPT_ID) ? 'cpg.php?id=' . (int)$DEPT_ID : 'cpg.php' ?>"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
                         <li><a class="dropdown-item" href="<?= isset($DEPT_ID) ? 'wi.php?id=' . (int)$DEPT_ID : 'wi.php' ?>"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
-                        <li><a class="dropdown-item" href="<?= isset($DEPT_ID) ? 'research.php?id=' . (int)$DEPT_ID : 'research.php' ?>"><i class="bi bi-search me-2"></i> วิจัย</a></li>
+                        <li><a class="dropdown-item" href="<?= isset($DEPT_ID) ? 'research.php?id=' . (int)$DEPT_ID : 'research.php' ?>"><i class="bi bi-search me-2"></i> วิจัย/CQI</a></li>
                     </ul>
                 </div>
 

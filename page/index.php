@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // 🔗 เรียกใช้งานไฟล์เชื่อมต่อฐานข้อมูล MySQL
 require_once 'connect.php';
 
@@ -231,7 +231,7 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
                         <li><a class="dropdown-item" href="service_profile_index.php"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
                         <li><a class="dropdown-item" href="cpg_index.php"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
                         <li><a class="dropdown-item" href="wi_index.php"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
-                        <li><a class="dropdown-item" href="research_index.php"><i class="bi bi-search me-2"></i> วิจัย</a></li>
+                        <li><a class="dropdown-item" href="research_index.php"><i class="bi bi-search me-2"></i> วิจัย/CQI</a></li>
                     </ul>
                 </div>
 

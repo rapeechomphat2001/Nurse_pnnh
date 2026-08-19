@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // =====================================================================
 //  กุมารเวช — หน้าหอผู้ป่วย/หน่วยงาน (เวอร์ชันปรับขนาดมีเดียและเมนูตามหน้าเดโมจริง)
 //  ดึงข้อมูลจากตาราง department_contents โดยอ้างอิง department_id = 1
@@ -241,7 +241,6 @@ $gc_rows = $conn->query("SELECT * FROM department_contents WHERE department_id I
                     <i class="bi bi-heart-pulse-fill me-1"></i>งานบริการ</a>
                     <ul class="dropdown-menu" aria-labelledby="serviceDropdown">
                         <li><a class="dropdown-item" href="<?= $DEPT_ID ? 'supervision_results_index.php?id='.(int)$DEPT_ID : 'supervision_results_index.php' ?>"><i class="bi bi-clipboard2-check-fill me-2"></i> ผลการนิเทศ</a></li>
-                        <li><a class="dropdown-item" href="patient_safety.php<?= $DEPT_ID ? '?id='.(int)$DEPT_ID : '' ?>"><i class="bi bi-shield-check me-2"></i> ความปลอดภัยผู้ป่วย</a></li>
                     </ul>
                 </div>
 
@@ -262,7 +261,7 @@ $gc_rows = $conn->query("SELECT * FROM department_contents WHERE department_id I
                         <li><a class="dropdown-item" href="<?= $DEPT_ID ? 'service_profile_index.php?id='.(int)$DEPT_ID : 'service_profile_index.php' ?>"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
                         <li><a class="dropdown-item" href="<?= $DEPT_ID ? 'cpg_index.php?id='.(int)$DEPT_ID : 'cpg_index.php' ?>"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
                         <li><a class="dropdown-item" href="<?= $DEPT_ID ? 'wi_index.php?id='.(int)$DEPT_ID : 'wi_index.php' ?>"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
-                        <li><a class="dropdown-item" href="<?= $DEPT_ID ? 'research_index.php?id='.(int)$DEPT_ID : 'research_index.php' ?>"><i class="bi bi-search me-2"></i> วิจัย</a></li>
+                        <li><a class="dropdown-item" href="<?= $DEPT_ID ? 'research_index.php?id='.(int)$DEPT_ID : 'research_index.php' ?>"><i class="bi bi-search me-2"></i> วิจัย/CQI</a></li>
                     </ul>
                 </div>
 

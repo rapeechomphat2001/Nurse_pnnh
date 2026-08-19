@@ -1,8 +1,7 @@
 <?php
 require_once __DIR__ . '/../assets/version.php';
-// ===== โหมดการทำงาน =====
-// - type=dept&id=<id>  -> ดูเอกสารของแผนก (ตาราง department_contents ผ่าน API)
-// - id=<id> (ไม่มี type) -> ดูข่าวกลาง (ตาราง news ผ่าน API)
+require_once 'connect.php';
+
 $type    = $_GET['type'] ?? 'news';
 $item_id = (int)($_GET['id'] ?? 0);
 
@@ -10,13 +9,40 @@ if ($item_id <= 0) {
     header('Location: index.php');
     exit;
 }
+
+// news type — ดึงจาก DB ตรงๆ ไม่ผ่าน API
+$news_item    = null;
+$related_news = [];
+
+if ($type === 'news') {
+    $stmt = $conn->prepare("SELECT * FROM news WHERE id = :id LIMIT 1");
+    $stmt->execute([':id' => $item_id]);
+    $news_item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$news_item) {
+        header('Location: all_news.php');
+        exit;
+    }
+
+    $stmt2 = $conn->prepare("SELECT id, title, created_at FROM news WHERE id != :id ORDER BY id DESC LIMIT 5");
+    $stmt2->execute([':id' => $item_id]);
+    $related_news = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function dateToThaiFull($dateStr) {
+    if (empty($dateStr) || $dateStr === '0000-00-00') return 'ไม่ระบุวันที่';
+    $time = strtotime($dateStr);
+    if (!$time) return htmlspecialchars($dateStr);
+    $months = ["","มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+    return date('j', $time) . ' ' . $months[(int)date('n', $time)] . ' ' . (date('Y', $time) + 543);
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitleTag">กำลังโหลด... - กลุ่มงานการพยาบาล</title>
+    <title><?= $type === 'news' && $news_item ? htmlspecialchars($news_item['title']) . ' - กลุ่มงานการพยาบาล' : 'กำลังโหลด... - กลุ่มงานการพยาบาล' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,9 +56,9 @@ if ($item_id <= 0) {
 
 <div class="page-header">
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h1 id="headerTitle"><i class="bi bi-newspaper me-2"></i>กำลังโหลด...</h1>
-        <a href="index.php" class="btn-back" id="backLink">
-            <i class="bi bi-arrow-left-circle-fill"></i> <span id="backText">กลับหน้าหลัก</span>
+        <h1><?php if ($type === 'news'): ?><i class="bi bi-newspaper me-2"></i>รายละเอียดข่าว<?php else: ?><i class="bi bi-newspaper me-2" id="headerTitle">กำลังโหลด...</i><?php endif; ?></h1>
+        <a href="all_news.php" class="btn-back" id="backLink">
+            <i class="bi bi-arrow-left-circle-fill"></i> <span id="backText">กลับรายการข่าว</span>
         </a>
     </div>
 </div>
@@ -41,16 +67,61 @@ if ($item_id <= 0) {
     <div class="row g-4">
 
         <div class="col-lg-8">
+<?php if ($type === 'news' && $news_item): ?>
+            <?php
+                $img = !empty($news_item['image_name']) && $news_item['image_name'] !== 'default.jpg'
+                    ? htmlspecialchars($news_item['image_name']) : null;
+            ?>
+            <div class="detail-card">
+                <?php if ($img): ?>
+                <img src="../uploads/<?= $img ?>" class="detail-hero-img lightbox-trigger" alt="<?= htmlspecialchars($news_item['title']) ?>" onerror="this.style.display='none'">
+                <?php endif; ?>
+                <div class="detail-body">
+                    <h1 class="detail-title"><?= htmlspecialchars($news_item['title']) ?></h1>
+                    <div class="detail-meta">
+                        <span class="badge-date"><i class="bi bi-calendar-event me-1"></i><?= dateToThaiFull($news_item['created_at']) ?></span>
+                        <?php if (!empty($news_item['is_new']) && (int)$news_item['is_new'] === 1): ?>
+                        <span class="badge-isnew"><i class="bi bi-stars me-1"></i>ใหม่</span>
+                        <?php endif; ?>
+                    </div>
+                    <hr class="detail-divider">
+                    <?php if (!empty($news_item['content']) && trim($news_item['content']) !== ''): ?>
+                    <div class="detail-content"><?= nl2br(htmlspecialchars($news_item['content'])) ?></div>
+                    <?php else: ?>
+                    <div class="detail-content-empty"><i class="bi bi-newspaper mb-2 d-block" style="font-size:32px;color:#ddd;"></i>ไม่มีรายละเอียดเพิ่มเติม</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+<?php else: ?>
             <div class="detail-card" id="detailCard">
                 <div class="text-center text-muted py-5"><i class="bi bi-hourglass-split"></i> กำลังโหลด...</div>
             </div>
+<?php endif; ?>
         </div>
 
         <div class="col-lg-4">
-            <div class="section-title" id="relatedBoxTitle"><i class="bi bi-megaphone-fill me-1"></i> ข่าวอื่นๆ</div>
+            <div class="section-title"><i class="bi bi-megaphone-fill me-1"></i> ข่าวอื่นๆ</div>
+<?php if ($type === 'news'): ?>
+            <div class="bg-white border rounded p-3">
+                <?php if (empty($related_news)): ?>
+                <p class="text-muted small mb-0">ไม่มีรายการอื่น</p>
+                <?php else: ?>
+                <?php foreach ($related_news as $r): ?>
+                <a href="news_detail.php?id=<?= (int)$r['id'] ?>" class="related-news-item">
+                    <i class="bi bi-chevron-right small"></i>
+                    <div>
+                        <div class="related-news-title"><?= htmlspecialchars($r['title']) ?></div>
+                        <div class="related-news-date"><?= dateToThaiFull($r['created_at']) ?></div>
+                    </div>
+                </a>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+<?php else: ?>
             <div class="bg-white border rounded p-3" id="relatedList">
                 <p class="text-muted small mb-0">กำลังโหลด...</p>
             </div>
+<?php endif; ?>
         </div>
 
     </div>
@@ -75,10 +146,10 @@ if ($item_id <= 0) {
             <div class="col-md-4">
                 <h5><i class="bi bi-link-45deg"></i> ลิงก์ที่เกี่ยวข้อง</h5>
                 <ul class="small opacity-80">
-                    <li><i class="bi bi-chevron-right"></i> <a href="#">กระทรวงสาธารณสุข</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="#">สภาการพยาบาล</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="#">กรมการแพทย์</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="#">สรพ. (HA)</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://moph.go.th/" target="_blank" rel="noopener noreferrer">กระทรวงสาธารณสุข</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.tnmc.or.th/" target="_blank" rel="noopener noreferrer">สภาการพยาบาล</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.dms.go.th/?StartWeb=1" target="_blank" rel="noopener noreferrer">กรมการแพทย์</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="https://www.ha.or.th/TH/Home/%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81" target="_blank" rel="noopener noreferrer">สรพ. (HA)</a></li>
                 </ul>
             </div>
         </div>
@@ -91,12 +162,13 @@ if ($item_id <= 0) {
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<?php if ($type === 'dept'): ?>
 <script>window.NEWS_DETAIL_TYPE = <?= json_encode($type) ?>; window.NEWS_DETAIL_ID = <?= (int)$item_id ?>;</script>
 <script src="<?= av('../assets/js/api-config.js') ?>"></script>
 <script>
 (function () {
     const API_BASE = window.API_BASE;
-    const type = window.NEWS_DETAIL_TYPE;
     const itemId = window.NEWS_DETAIL_ID;
 
     const sectionLabels = {
@@ -115,96 +187,35 @@ if ($item_id <= 0) {
         if (!dateStr) return 'ไม่ระบุวันที่';
         const d = new Date(dateStr);
         if (isNaN(d)) return 'ไม่ระบุวันที่';
-        const months = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const months = ["","มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
         return `${d.getDate()} ${months[d.getMonth() + 1]} ${d.getFullYear() + 543}`;
     }
 
     function parseFileNames(fileData) {
         if (!fileData) return [];
-        try {
-            const decoded = JSON.parse(fileData);
-            if (Array.isArray(decoded)) return decoded;
-        } catch (e) { /* ไม่ใช่ JSON ก็ถือว่าเป็นชื่อไฟล์เดี่ยว */ }
+        try { const d = JSON.parse(fileData); if (Array.isArray(d)) return d; } catch (e) {}
         return typeof fileData === 'string' ? [fileData] : [];
     }
 
-    function extOf(fname) {
-        return (fname.split('.').pop() || '').toLowerCase();
-    }
+    function extOf(fname) { return (fname.split('.').pop() || '').toLowerCase(); }
 
     function downloadTile(fname) {
         const ext = extOf(fname);
         let icon = 'bi-file-earmark-arrow-down', label = 'ไฟล์เอกสาร';
-        if (['doc', 'docx'].includes(ext)) { icon = 'bi-file-earmark-word-fill'; label = 'ไฟล์ Word'; }
-        else if (['xls', 'xlsx', 'csv'].includes(ext)) { icon = 'bi-file-earmark-excel-fill'; label = 'ไฟล์ Excel'; }
-        else if (['ppt', 'pptx'].includes(ext)) { icon = 'bi-file-earmark-slides-fill'; label = 'ไฟล์ PowerPoint'; }
+        if (['doc','docx'].includes(ext)) { icon = 'bi-file-earmark-word-fill'; label = 'ไฟล์ Word'; }
+        else if (['xls','xlsx','csv'].includes(ext)) { icon = 'bi-file-earmark-excel-fill'; label = 'ไฟล์ Excel'; }
+        else if (['ppt','pptx'].includes(ext)) { icon = 'bi-file-earmark-slides-fill'; label = 'ไฟล์ PowerPoint'; }
         return `<a href="../uploads/${esc(fname)}" target="_blank" class="dc-file-tile mt-3">
                     <i class="bi ${icon}"></i>
                     <div class="dc-file-tile-label">${label}<small>คลิกเพื่อเปิด/ดาวน์โหลด</small></div>
                 </a>`;
     }
 
-    function renderDetail(item, sectionLabel) {
-        const fileList = type === 'dept'
-            ? parseFileNames(item.file_name)
-            : (item.image_name && item.image_name !== 'default.jpg' ? [item.image_name] : []);
-
-        let heroImage = null, heroPdf = null, heroVideo = null;
-        const downloadFiles = [];
-        fileList.forEach(fname => {
-            if (!fname || fname === 'default.jpg') return;
-            const ext = extOf(fname);
-            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext) && !heroImage) { heroImage = fname; return; }
-            if (ext === 'pdf' && !heroPdf) { heroPdf = fname; return; }
-            if (['mp4', 'webm', 'ogg'].includes(ext) && !heroVideo) { heroVideo = fname; return; }
-            downloadFiles.push(fname);
-        });
-
-        let heroHtml = '';
-        if (heroImage) {
-            heroHtml = `<img src="../uploads/${esc(heroImage)}" class="detail-hero-img lightbox-trigger" alt="${esc(item.title)}" onerror="this.style.display='none'">`;
-        } else if (heroPdf) {
-            heroHtml = `<div class="dc-pdf-wrap pdf-lightbox-trigger" data-src="../uploads/${esc(heroPdf)}">
-                            <embed src="../uploads/${esc(heroPdf)}" type="application/pdf" class="pdf-embed">
-                            <div class="dc-pdf-overlay"><i class="bi bi-arrows-fullscreen"></i> คลิกเพื่อดูเต็มจอ</div>
-                        </div>`;
-        } else if (heroVideo) {
-            heroHtml = `<video class="pdf-embed" controls preload="metadata"><source src="../uploads/${esc(heroVideo)}"></video>`;
-        }
-
-        const isNewBadge = (type !== 'dept' && Number(item.is_new) === 1)
-            ? '<span class="badge-isnew"><i class="bi bi-stars me-1"></i>ใหม่</span>' : '';
-        const sectionBadge = sectionLabel
-            ? `<span class="badge-date" style="background-color:#6c757d;"><i class="bi bi-tag-fill me-1"></i>${esc(sectionLabel)}</span>` : '';
-        const contentHtml = (item.content && item.content.trim())
-            ? `<div class="detail-content">${esc(item.content)}</div>`
-            : `<div class="detail-content-empty"><i class="bi bi-newspaper mb-2 d-block" style="font-size:32px;color:#ddd;"></i>ไม่มีรายละเอียดเพิ่มเติม</div>`;
-        const downloadsHtml = downloadFiles.map(downloadTile).join('');
-
-        document.getElementById('detailCard').innerHTML = `
-            ${heroHtml}
-            <div class="detail-body">
-                <h1 class="detail-title">${esc(item.title)}</h1>
-                <div class="detail-meta">
-                    <span class="badge-date"><i class="bi bi-calendar-event me-1"></i>${dateToThaiFull(item.created_at)}</span>
-                    ${sectionBadge}
-                    ${isNewBadge}
-                </div>
-                <hr class="detail-divider">
-                ${contentHtml}
-                ${downloadsHtml}
-            </div>`;
-
-        document.getElementById('pageTitleTag').textContent = `${item.title} - กลุ่มงานการพยาบาล`;
-        document.getElementById('headerTitle').innerHTML =
-            `<i class="bi bi-newspaper me-2"></i>${type === 'dept' ? ('เอกสาร — ' + esc(item.dept_name || '')) : 'รายละเอียดข่าว'}`;
-    }
-
-    function renderRelated(list, linkPrefix) {
+    function renderRelated(list) {
         const box = document.getElementById('relatedList');
         if (!list.length) { box.innerHTML = '<p class="text-muted small mb-0">ไม่มีรายการอื่น</p>'; return; }
         box.innerHTML = list.map(r => `
-            <a href="${linkPrefix}${parseInt(r.id, 10)}" class="related-news-item">
+            <a href="news_detail.php?type=dept&id=${parseInt(r.id, 10)}" class="related-news-item">
                 <i class="bi bi-chevron-right small"></i>
                 <div>
                     <div class="related-news-title">${esc(r.title)}</div>
@@ -213,47 +224,63 @@ if ($item_id <= 0) {
             </a>`).join('');
     }
 
-    if (type === 'dept') {
-        fetch(`${API_BASE}/departments/contents/item/${itemId}`)
-            .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
-            .then(item => {
-                renderDetail(item, sectionLabels[item.section] || item.section);
+    fetch(`${API_BASE}/departments/contents/item/${itemId}`)
+        .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
+        .then(item => {
+            const fileList = parseFileNames(item.file_name);
+            let heroImage = null, heroPdf = null, heroVideo = null;
+            const downloadFiles = [];
+            fileList.forEach(fname => {
+                if (!fname || fname === 'default.jpg') return;
+                const ext = extOf(fname);
+                if (['jpg','jpeg','png','gif','webp'].includes(ext) && !heroImage) { heroImage = fname; return; }
+                if (ext === 'pdf' && !heroPdf) { heroPdf = fname; return; }
+                if (['mp4','webm','ogg'].includes(ext) && !heroVideo) { heroVideo = fname; return; }
+                downloadFiles.push(fname);
+            });
 
-                const backUrl = item.dept_link || 'index.php';
-                document.getElementById('backLink').setAttribute('href', backUrl);
-                document.getElementById('backText').textContent = 'กลับหน้า ' + (item.dept_name || 'แผนก');
-                document.getElementById('relatedBoxTitle').innerHTML =
-                    '<i class="bi bi-megaphone-fill me-1"></i> เอกสารอื่นในแผนก';
+            let heroHtml = '';
+            if (heroImage) heroHtml = `<img src="../uploads/${esc(heroImage)}" class="detail-hero-img lightbox-trigger" alt="${esc(item.title)}" onerror="this.style.display='none'">`;
+            else if (heroPdf) heroHtml = `<div class="dc-pdf-wrap pdf-lightbox-trigger" data-src="../uploads/${esc(heroPdf)}"><embed src="../uploads/${esc(heroPdf)}" type="application/pdf" class="pdf-embed"><div class="dc-pdf-overlay"><i class="bi bi-arrows-fullscreen"></i> คลิกเพื่อดูเต็มจอ</div></div>`;
+            else if (heroVideo) heroHtml = `<video class="pdf-embed" controls preload="metadata"><source src="../uploads/${esc(heroVideo)}"></video>`;
 
-                return fetch(`${API_BASE}/departments/${item.department_id}/contents`)
-                    .then(res => res.json())
-                    .then(data => {
-                        const related = (data.contents || [])
-                            .filter(r => parseInt(r.id, 10) !== itemId)
-                            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                            .slice(0, 5);
-                        renderRelated(related, 'news_detail.php?type=dept&id=');
-                    });
-            })
-            .catch(() => { location.href = 'index.php'; });
-    } else {
-        fetch(`${API_BASE}/news/${itemId}`)
-            .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
-            .then(item => {
-                renderDetail(item, '');
-                return fetch(`${API_BASE}/news`)
-                    .then(res => res.json())
-                    .then(list => {
-                        const related = (Array.isArray(list) ? list : [])
-                            .filter(r => parseInt(r.id, 10) !== itemId)
-                            .slice(0, 5);
-                        renderRelated(related, 'news_detail.php?id=');
-                    });
-            })
-            .catch(() => { location.href = 'index.php'; });
-    }
+            const sectionLabel = sectionLabels[item.section] || item.section;
+            const contentHtml = (item.content && item.content.trim())
+                ? `<div class="detail-content">${esc(item.content)}</div>`
+                : `<div class="detail-content-empty"><i class="bi bi-newspaper mb-2 d-block" style="font-size:32px;color:#ddd;"></i>ไม่มีรายละเอียดเพิ่มเติม</div>`;
+
+            document.getElementById('detailCard').innerHTML = `
+                ${heroHtml}
+                <div class="detail-body">
+                    <h1 class="detail-title">${esc(item.title)}</h1>
+                    <div class="detail-meta">
+                        <span class="badge-date"><i class="bi bi-calendar-event me-1"></i>${dateToThaiFull(item.created_at)}</span>
+                        <span class="badge-date" style="background-color:#6c757d;"><i class="bi bi-tag-fill me-1"></i>${esc(sectionLabel)}</span>
+                    </div>
+                    <hr class="detail-divider">
+                    ${contentHtml}
+                    ${downloadFiles.map(downloadTile).join('')}
+                </div>`;
+
+            document.querySelector('title').textContent = `${item.title} - กลุ่มงานการพยาบาล`;
+            const backUrl = item.dept_link || 'index.php';
+            document.getElementById('backLink').setAttribute('href', backUrl);
+            document.getElementById('backText').textContent = 'กลับหน้า ' + (item.dept_name || 'แผนก');
+
+            return fetch(`${API_BASE}/departments/${item.department_id}/contents`)
+                .then(res => res.json())
+                .then(data => {
+                    const related = (data.contents || [])
+                        .filter(r => parseInt(r.id, 10) !== itemId)
+                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                        .slice(0, 5);
+                    renderRelated(related);
+                });
+        })
+        .catch(() => { location.href = 'index.php'; });
 })();
 </script>
+<?php endif; ?>
 
 <div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-centered p-0" style="background:rgba(0,0,0,0.92);">
@@ -270,17 +297,13 @@ if ($item_id <= 0) {
 <script>
 (function () {
     const modalEl = document.getElementById('lightboxModal');
-    const imgEl   = document.getElementById('lightboxImg');
-    const pdfEl   = document.getElementById('lightboxPdf');
-    let bsModal   = null;
+    if (!modalEl) return;
+    const imgEl = document.getElementById('lightboxImg');
+    const pdfEl = document.getElementById('lightboxPdf');
+    let bsModal = null;
     function openLightbox(type, src) {
-        if (type === 'img') {
-            imgEl.src = src; imgEl.style.display = 'block';
-            pdfEl.style.display = 'none'; pdfEl.src = '';
-        } else if (type === 'pdf') {
-            pdfEl.src = src; pdfEl.style.display = 'block';
-            imgEl.style.display = 'none'; imgEl.src = '';
-        }
+        if (type === 'img') { imgEl.src = src; imgEl.style.display = 'block'; pdfEl.style.display = 'none'; pdfEl.src = ''; }
+        else if (type === 'pdf') { pdfEl.src = src; pdfEl.style.display = 'block'; imgEl.style.display = 'none'; imgEl.src = ''; }
         if (!bsModal) bsModal = new bootstrap.Modal(modalEl);
         bsModal.show();
     }

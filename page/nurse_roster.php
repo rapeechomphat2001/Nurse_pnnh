@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // =====================================================================
 //  กุมารเวช — หน้าหอผู้ป่วย/หน่วยงาน (เวอร์ชันปรับขนาดมีเดียและเมนูตามหน้าเดโมจริง)
 //  ดึงข้อมูลจากตาราง department_contents โดยอ้างอิง department_id = 1
@@ -244,7 +244,7 @@ function renderAttachments($row) {
                         <li><a class="dropdown-item" href="service_profile.php"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
                         <li><a class="dropdown-item" href="cpg.php"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
                         <li><a class="dropdown-item" href="wi.php"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
-                        <li><a class="dropdown-item" href="research.php"><i class="bi bi-search me-2"></i> วิจัย</a></li>
+                        <li><a class="dropdown-item" href="research.php"><i class="bi bi-search me-2"></i> วิจัย/CQI</a></li>
                     </ul>
                 </div>
 
