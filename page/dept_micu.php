@@ -2,9 +2,9 @@
 // =====================================================================
 //  MICU — หน้าหอผู้ป่วย/หน่วยงาน
 //  ข้อมูลทั้งหมด (เมนู/เนื้อหา/บุคลากร) ดึงผ่าน Node.js API — ดู assets/js/dept-api.js
-//  API: GET http://localhost:3000/api/departments/17/contents
+//  API: GET http://localhost:3000/api/departments/6/contents
 // =====================================================================
-$DEPT_ID   = 17;
+$DEPT_ID   = 6;
 $DEPT_NAME = 'MICU';
 ?>
 <!DOCTYPE html>

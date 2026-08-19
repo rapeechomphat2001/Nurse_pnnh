@@ -2,9 +2,9 @@
 // =====================================================================
 //  SICU — หน้าหอผู้ป่วย/หน่วยงาน
 //  ข้อมูลทั้งหมด (เมนู/เนื้อหา/บุคลากร) ดึงผ่าน Node.js API — ดู assets/js/dept-api.js
-//  API: GET http://localhost:3000/api/departments/20/contents
+//  API: GET http://localhost:3000/api/departments/18/contents
 // =====================================================================
-$DEPT_ID   = 20;
+$DEPT_ID   = 18;
 $DEPT_NAME = 'SICU';
 ?>
 <!DOCTYPE html>

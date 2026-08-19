@@ -2,9 +2,9 @@
 // =====================================================================
 //  IC — หน้าหอผู้ป่วย/หน่วยงาน
 //  ข้อมูลทั้งหมด (เมนู/เนื้อหา/บุคลากร) ดึงผ่าน Node.js API — ดู assets/js/dept-api.js
-//  API: GET http://localhost:3000/api/departments/16/contents
+//  API: GET http://localhost:3000/api/departments/3/contents
 // =====================================================================
-$DEPT_ID   = 16;
+$DEPT_ID   = 3;
 $DEPT_NAME = 'IC';
 ?>
 <!DOCTYPE html>
