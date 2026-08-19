@@ -44,6 +44,7 @@
 /* Hover on desktop */
 @media (min-width: 992px) {
     .nav-item.dropdown:hover .dropdown-menu { display: block; margin-top: 0; }
+    .dept-dropdown-menu { max-height: none; overflow-y: visible; }
 }
 
 /* ==================== TAB SECTION ==================== */
