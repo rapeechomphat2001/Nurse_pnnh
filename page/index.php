@@ -115,7 +115,7 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
             overflow-x: hidden;
         }
         body.home-page {
-            padding-top: 180px;
+            padding-top: 180px; /* overridden by JS below */
         }
         #siteHeader {
             position: fixed !important;
@@ -474,6 +474,17 @@ function updateThaiLiveClock() {
 }
 updateThaiLiveClock();
 setInterval(updateThaiLiveClock, 1000);
+
+// Adjust body padding to match actual fixed header height
+function syncHeaderPadding() {
+    const h = document.getElementById('siteHeader');
+    if (h) document.body.style.paddingTop = h.offsetHeight + 'px';
+}
+syncHeaderPadding();
+window.addEventListener('resize', syncHeaderPadding);
+// Re-sync when navbar collapse animation ends (mobile expand/collapse changes header height)
+document.getElementById('navbarContent')?.addEventListener('shown.bs.collapse', syncHeaderPadding);
+document.getElementById('navbarContent')?.addEventListener('hidden.bs.collapse', syncHeaderPadding);
 
 // Scroll to top
 window.addEventListener('scroll', function() {
