@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // =====================================================================
 //  ตรวจรักษาพิเศษ — หน้าหอผู้ป่วย/หน่วยงาน
 //  ข้อมูลทั้งหมด (เมนู/เนื้อหา/บุคลากร) ดึงผ่าน Node.js API — ดู assets/js/dept-api.js
@@ -18,8 +18,8 @@ $DEPT_NAME = 'ตรวจรักษาพิเศษ';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="department.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/department.css">
 </head>
 <body>
 
