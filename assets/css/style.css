@@ -402,6 +402,9 @@ img {
     .main-nav .navbar-collapse {
         width: 100%;
         margin-right: auto;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .main-nav .navbar-nav {
