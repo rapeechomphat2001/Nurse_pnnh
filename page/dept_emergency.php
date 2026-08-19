@@ -60,6 +60,7 @@ $DEPT_NAME = 'อุบัติเหตุ-ฉุกเฉิน';
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
                         <li><a class="dropdown-item" href="executives.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-person-badge-fill me-2"></i> ทำเนียบหัวหน้ากลุ่มงาน</a></li>
+                        <li><a class="dropdown-item" href="ward_heads.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-person-lines-fill me-2"></i> ทำเนียบหัวหน้างาน</a></li>
                         <li><a class="dropdown-item" href="personnel_gallery.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-people-fill me-2"></i> รูปบุคลากร</a></li>
                     </ul>
                 </div>
