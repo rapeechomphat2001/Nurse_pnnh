@@ -88,13 +88,11 @@ function renderSectionOptions($primary_sections, $primary_label, $general_conten
 $department_content_sections = [
     'knowledge'           => 'ข่าวสารของแผนก',
     'structure'           => 'โครงสร้างการบริหารงาน',
-    'personnel'           => 'ทำเนียบบุคลากร',
     'executives'          => 'ทำเนียบหัวหน้ากลุ่มงาน',
     'ward_heads'          => 'ทำเนียบหัวหน้างาน',
-    'service'             => 'การให้บริการ',
     'service_profile'     => 'Service Profile',
     'kpi'                 => 'ตัวชี้วัดคุณภาพ',
-    'research'            => 'วิจัย',
+    'research'            => 'วิจัย/CQI',
     'wi'                  => 'WI',
     'cpg'                 => 'CNPG',
     'risk_management'     => 'บริหารความเสี่ยง',
@@ -138,7 +136,7 @@ $general_content_sections = [
     'service_profile'     => 'Service Profile',
     'cpg'                 => 'CNPG',
     'wi'                  => 'WI',
-    'research'            => 'วิจัย',
+    'research'            => 'วิจัย/CQI',
 
     // งานสารสนเทศ
     'staffing'            => 'อัตรากำลัง',
