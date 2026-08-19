@@ -111,6 +111,7 @@ body {
 /* Bootstrap Carousel Slider */
 .carousel-item {
     height: 420px;
+    background: linear-gradient(135deg, var(--hosp-orange-dark) 0%, var(--hosp-orange) 60%, #e8a87c 100%);
     background-size: cover;
     background-position: center top;
     position: relative;
