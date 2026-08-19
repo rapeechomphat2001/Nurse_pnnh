@@ -29,10 +29,14 @@
     overflow-x: hidden;
     overflow-y: auto;
     padding: 10px 8px !important;
-    display: grid;
     grid-template-columns: 1fr 1fr;
     align-content: start;
     gap: 0;
+}
+/* แสดง grid เฉพาะตอนที่ dropdown เปิด — ไม่ทับ display:none ของ Bootstrap */
+.dept-dropdown-menu.show,
+.nav-item.dropdown:hover .dept-dropdown-menu {
+    display: grid !important;
 }
 .dept-dropdown-menu li { list-style: none; }
 .dept-dropdown-menu .dropdown-item {
@@ -44,7 +48,7 @@
 /* Hover on desktop */
 @media (min-width: 992px) {
     .nav-item.dropdown:hover .dropdown-menu { display: block; margin-top: 0; }
-    .dept-dropdown-menu { max-height: none; overflow-y: visible; }
+    .dept-dropdown-menu { max-height: none; overflow-y: visible; overflow-x: visible; }
 }
 
 /* ==================== TAB SECTION ==================== */
