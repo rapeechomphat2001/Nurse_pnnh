@@ -316,9 +316,9 @@ $slides = !empty($banner_list) ? $banner_list : $fallback_banners;
 <div class="container-fluid my-5">
     <div class="news-frame">
         <div class="news-wrapper">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold text-dark mb-0"><i class="bi bi-megaphone-fill text-danger"></i> ข่าวประชาสัมพันธ์</h3>
-                <a href="all_news.php" class="text-dark fw-semibold text-decoration-none"> ดูทั้งหมด › </a>
+            <div class="block-header mb-4">
+                <span class="fs-5 fw-bold"><i class="bi bi-megaphone-fill me-2"></i>ข่าวประชาสัมพันธ์</span>
+                <a href="all_news.php">ดูทั้งหมด ›</a>
             </div>
             <?php if(empty($news_list)): ?>
                 <div class="text-center py-5">ไม่มีข่าวประชาสัมพันธ์</div>
