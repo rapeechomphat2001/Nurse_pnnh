@@ -41,6 +41,20 @@ body {
 .main-nav {
     background-color: var(--hosp-orange-dark);
     border-bottom: 4px solid var(--hosp-orange);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+/* Fixed header wrapper สำหรับหน้าที่ไม่ใช่ index (สร้างโดย api-config.js) */
+#subHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 2147483647;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
 }
 .main-nav .nav-link {
     color: #ffffff !important;
@@ -106,6 +120,26 @@ body {
         box-shadow: 0 8px 24px rgba(0,0,0,.25) !important;
     }
     .dept-mega-item:hover .dept-mega-menu { display: grid !important; }
+
+    /* หอผู้ป่วย/หน่วยงาน dropdown: 2 คอลัมน์ที่ desktop */
+    .dept-dropdown-menu {
+        column-count: 2;
+        column-gap: 0;
+        min-width: 460px;
+    }
+}
+
+/* เปิด dropdown และ hamburger collapse ด้วย hover สำหรับ laptop/mouse */
+@media (hover: hover) {
+    .main-nav .nav-item.dropdown:hover > .dropdown-menu {
+        display: block !important;
+    }
+    /* hover บน hamburger หรือ menu เองแล้วเมนูโชว์ */
+    .main-nav .navbar-toggler:hover ~ .navbar-collapse,
+    .main-nav .navbar-collapse:hover {
+        display: flex !important;
+        height: auto !important;
+    }
 }
 
 /* Bootstrap Carousel Slider */
@@ -405,7 +439,10 @@ img {
         max-height: calc(100vh - 140px);
         overflow-y: auto;
         overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
+    .main-nav .navbar-collapse::-webkit-scrollbar { display: none; }
 
     .main-nav .navbar-nav {
         width: 100%;

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // =====================================================================
 //  กุมารเวชกรรม — หน้าหอผู้ป่วย/หน่วยงาน
 //  ข้อมูลทั้งหมด (เมนู/เนื้อหา/บุคลากร) ดึงผ่าน Node.js API — ดู assets/js/dept-api.js
@@ -101,7 +101,7 @@ $DEPT_NAME = 'กุมารเวชกรรม';
                     <ul class="dropdown-menu" aria-labelledby="qualityDropdown">
                         <li><a class="dropdown-item" href="kpi.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-bar-chart-fill me-2"></i> ตัวชี้วัดคุณภาพ</a></li>
                         <li><a class="dropdown-item" href="service_profile.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-file-earmark-person-fill me-2"></i> Service profile</a></li>
-                        <li><a class="dropdown-item" href="cpg.php"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
+                        <li><a class="dropdown-item" href="cpg.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-clipboard2-pulse-fill me-2"></i> CNPG</a></li>
                         <li><a class="dropdown-item" href="wi.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-file-earmark-text-fill me-2"></i> WI</a></li>
                         <li><a class="dropdown-item" href="research.php?id=<?= (int)$DEPT_ID ?>"><i class="bi bi-search me-2"></i> วิจัย/CQI</a></li>
                     </ul>
@@ -202,10 +202,10 @@ $DEPT_NAME = 'กุมารเวชกรรม';
 <!-- โหลด Bootstrap JS, กำหนด DEPT_ID ให้สคริปต์ฝั่ง client รู้ว่ากำลังแสดงแผนกไหน แล้วโหลดสคริปต์ดึง/แสดงข้อมูลแผนกจาก API -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>window.DEPT_ID = <?= (int)$DEPT_ID ?>;</script>
-<script src="assets/js/api-config.js"></script>
-<script src="assets/js/dept-api.js"></script>
-<script src="assets/js/dept-context.js"></script>
-<script src="assets/js/dept-banner.js"></script>
+<script src="../assets/js/api-config.js"></script>
+<script src="../assets/js/dept-api.js"></script>
+<script src="../assets/js/dept-context.js"></script>
+<script src="../assets/js/dept-banner.js"></script>
 <script>
 // เปิด/ปิดกล่อง Lightbox แสดงรูปภาพหรือ PDF แบบเต็มจอเมื่อคลิกที่รูป (.lightbox-trigger) หรือไฟล์แนบ (.pdf-lightbox-trigger)
 (function () {

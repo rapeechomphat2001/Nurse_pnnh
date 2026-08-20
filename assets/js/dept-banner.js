@@ -23,7 +23,7 @@
             ).join('');
 
             const items = slides.map((s, i) => {
-                const bg   = s.image_name ? `uploads/${esc(s.image_name)}` : '';
+                const bg   = s.image_name ? AppSecurity.safeUploadPath(s.image_name) : '';
                 const sub  = s.subtitle ? `<p class="mb-4" style="font-size:16px; opacity:0.95;">${esc(s.subtitle)}</p>` : '';
                 const link = s.link_url ? `<a href="${esc(s.link_url)}" target="_blank" class="btn-readmore">อ่านเพิ่มเติม</a>` : '';
                 return `<div class="carousel-item ${i === 0 ? 'active' : ''}" style="background-image:url('${bg}');">

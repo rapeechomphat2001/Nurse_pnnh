@@ -38,7 +38,7 @@
         let html = '';
         files.forEach(fname => {
             if (!fname || fname === 'default.jpg') return;
-            const safe = esc('uploads/' + fname);
+            const safe = AppSecurity.safeUploadPath(fname);
             const ext = extOf(fname);
             if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
                 html += `<img src="${safe}" class="dc-img lightbox-trigger shadow-sm border" alt="" onerror="this.style.display='none'">`;
@@ -82,7 +82,7 @@
         const pdfHtml = pdfRows.map(p => {
             const files = parseFileNames(p.file_name);
             const pdf = files.find(f => extOf(f) === 'pdf');
-            const safe = esc('uploads/' + pdf);
+            const safe = AppSecurity.safeUploadPath(pdf);
             return `<div class="dept-content-card mb-4">
                         <h2 class="dc-title">${esc(p.title)}</h2>
                         <div class="dc-meta mb-3"><i class="bi bi-calendar3 me-1"></i> ${dateToThaiFull(p.created_at)}</div>
@@ -96,7 +96,7 @@
             const files = parseFileNames(p.file_name);
             const img = files.find(f => ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extOf(f)));
             const imgHtml = img
-                ? `<img src="uploads/${esc(img)}" class="personnel-img lightbox-trigger img-fluid mx-auto mb-3" alt="" style="width:100%;height:auto;max-height:280px;object-fit:cover;">`
+                ? `<img src="${AppSecurity.safeUploadPath(img)}" class="personnel-img lightbox-trigger img-fluid mx-auto mb-3" alt="" style="width:100%;height:auto;max-height:280px;object-fit:cover;">`
                 : `<div class="personnel-img personnel-img-placeholder d-flex align-items-center justify-content-center bg-light text-muted mx-auto mb-3" style="width:100%;height:220px;font-size:64px;"><i class="bi bi-person-fill"></i></div>`;
             const role = (p.content || '').trim()
                 ? `<div class="personnel-role small text-muted fw-semibold">${esc(p.content)}</div>` : '';

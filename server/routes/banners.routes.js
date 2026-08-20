@@ -14,4 +14,19 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET active banners by department_id
+router.get("/department/:id", async (req, res) => {
+  try {
+    const deptId = parseInt(req.params.id, 10);
+    if (!deptId) return res.json([]);
+    const [rows] = await db.query(
+      "SELECT * FROM banners WHERE department_id = ? AND is_active = 1 ORDER BY sort_order",
+      [deptId]
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

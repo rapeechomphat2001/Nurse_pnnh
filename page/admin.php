@@ -31,6 +31,10 @@ if ($is_dept_admin) {
     $_GET['dept_id'] = $user_dept_id;
 } else {
     $active_tab = $_GET['tab'] ?? 'index_page';
+    // compat: tab=news ถูกย้ายไปอยู่ใน tab index_page
+    if ($active_tab === 'news') {
+        header("Location: admin.php?tab=index_page&idx_section=idx_news"); exit;
+    }
 }
 
 // ฟังก์ชันตรวจสิทธิ์ก่อนแก้ department_contents
@@ -226,6 +230,7 @@ $index_page_groups = [
         'idx_dashboard' => 'Dashbord',
     ],
     'ข่าวสารประชาสัมพันธ์' => [
+        'idx_news'            => 'ข่าวประชาสัมพันธ์',
         'idx_meeting_reports' => 'รายงานการประชุม',
     ],
 ];
@@ -285,7 +290,7 @@ try {
 // ---------- helpers ----------
 function uploadAdminFile($fieldName, $prefix, $oldFile = '') {
     if (empty($_FILES[$fieldName]['name'])) return $oldFile;
-    if (!is_dir('uploads')) mkdir('uploads', 0777, true);
+    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
     $orig     = basename($_FILES[$fieldName]['name']);
     $safeName = trim(preg_replace('/[\x00\/\\\\:*?"<>|]+/', '', $orig), '. ');
     $fileName = time() . '_' . $prefix . '_' . ($safeName ?: 'file');
@@ -295,7 +300,7 @@ function uploadAdminFile($fieldName, $prefix, $oldFile = '') {
 
 function uploadMultipleAdminFiles($fieldName, $prefix, $oldFiles = '') {
     if (empty($_FILES[$fieldName]['name'][0])) return $oldFiles;
-    if (!is_dir('uploads')) mkdir('uploads', 0777, true);
+    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
 
     $existingFiles = [];
     if (!empty($oldFiles)) {
@@ -374,6 +379,36 @@ if ($is_main_admin) {
         exit;
     }
 
+    // แก้ไขข้อมูลผู้ใช้ (ชื่อที่แสดง, ประเภท, แผนก)
+    if (isset($_POST['action_user']) && $_POST['action_user'] === 'update') {
+        $uid = (int)($_POST['id'] ?? 0);
+        $u_display_name  = trim($_POST['u_display_name'] ?? '');
+        $u_role          = $_POST['u_role'] ?? '';
+        $u_department_id = ($u_role === 'dept') ? (int)($_POST['u_department_id'] ?? 0) : null;
+        if ($uid <= 0) {
+            $_SESSION['user_flash'] = ['type' => 'danger', 'msg' => 'ไม่พบผู้ใช้'];
+        } elseif (!in_array($u_role, ['main', 'dept'], true)) {
+            $_SESSION['user_flash'] = ['type' => 'danger', 'msg' => 'ประเภทผู้ใช้ไม่ถูกต้อง'];
+        } elseif ($u_role === 'dept' && $u_department_id <= 0) {
+            $_SESSION['user_flash'] = ['type' => 'danger', 'msg' => 'กรุณาเลือกแผนกสำหรับ admin แผนก'];
+        } else {
+            $cur = $conn->prepare("SELECT role FROM users WHERE id = :id");
+            $cur->execute([':id' => $uid]);
+            $curRow = $cur->fetch(PDO::FETCH_ASSOC);
+            if ($curRow && $curRow['role'] === 'main' && $u_role === 'dept') {
+                $cnt = (int)$conn->query("SELECT COUNT(*) FROM users WHERE role='main'")->fetchColumn();
+                if ($cnt <= 1) {
+                    $_SESSION['user_flash'] = ['type' => 'danger', 'msg' => 'ไม่สามารถเปลี่ยนประเภท admin หลักคนสุดท้ายได้'];
+                    header("Location: admin.php?tab=users"); exit;
+                }
+            }
+            $conn->prepare("UPDATE users SET display_name=:n, role=:r, department_id=:d WHERE id=:id")
+                ->execute([':n' => $u_display_name ?: null, ':r' => $u_role, ':d' => $u_department_id, ':id' => $uid]);
+            $_SESSION['user_flash'] = ['type' => 'success', 'msg' => 'อัปเดตข้อมูลผู้ใช้เรียบร้อยแล้ว'];
+        }
+        header("Location: admin.php?tab=users"); exit;
+    }
+
     // ลบผู้ใช้
     if (isset($_GET['del_user'])) {
         $uid = (int)$_GET['del_user'];
@@ -447,11 +482,11 @@ if (isset($_POST['action_news'])) {
         $stmt = $conn->prepare("UPDATE news SET title=:title, content=:content, created_at=:created_at, image_name=:image_name, is_new=:is_new, link_url=:link_url WHERE id=:id");
         $stmt->execute([':title' => $_POST['title'], ':content' => $_POST['content'] ?? '', ':created_at' => $created_at, ':image_name' => $file_name, ':is_new' => $is_new_status, ':link_url' => $link_url, ':id' => $_POST['id']]);
     }
-    header("Location: admin.php?tab=news"); exit;
+    header("Location: admin.php?tab=index_page&idx_section=idx_news"); exit;
 }
 if (isset($_GET['del_news'])) {
     $conn->prepare("DELETE FROM news WHERE id=:id")->execute([':id' => $_GET['del_news']]);
-    header("Location: admin.php?tab=news"); exit;
+    header("Location: admin.php?tab=index_page&idx_section=idx_news"); exit;
 }
 
 // [2] หน่วยงาน (departments)
@@ -518,7 +553,15 @@ if (isset($_POST['action_dept_content'])) {
     $section = $submitted_section;
 
     $sort_order    = max(1, (int)($_POST['sort_order'] ?? 1));
-    $link_url      = !empty($_POST['link_url']) ? $_POST['link_url'] : null;
+    if (!empty($_POST['link_url'])) {
+        $link_url = $_POST['link_url'];
+    } elseif ($_POST['action_dept_content'] == 'update' && !array_key_exists('link_url', $_POST)) {
+        $lnk_stmt = $conn->prepare("SELECT link_url FROM department_contents WHERE id = :id");
+        $lnk_stmt->execute([':id' => $_POST['id']]);
+        $link_url = $lnk_stmt->fetchColumn() ?: null;
+    } else {
+        $link_url = null;
+    }
     $file_name     = uploadMultipleAdminFiles('content_file', 'dept_content', $_POST['old_file'] ?? '');
 
     // หน้าทำเนียบแบบ Grid (หัวหน้ากลุ่มงาน/หัวหน้างาน แบบผูกแผนก) — จัดลำดับแสดงผลอัตโนมัติตามตำแหน่งที่เลือก ไม่ต้องกรอกเอง
@@ -607,9 +650,12 @@ $selected_idx_section = (string)($_GET['idx_section'] ?? '');
 $selected_idx_section = isset($index_page_sections[$selected_idx_section]) ? $selected_idx_section : '';
 
 if ($active_tab == 'index_page') {
-    if ($selected_idx_section !== '') {
+    if ($selected_idx_section === 'idx_news') {
+        $news_items = $conn->query("SELECT * FROM news ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+    } elseif ($selected_idx_section !== '') {
         $stmt = $conn->prepare("SELECT * FROM department_contents WHERE department_id IS NULL AND section = :section ORDER BY sort_order ASC, id DESC");
         $stmt->execute([':section' => idxSectionToDbSection($selected_idx_section, $general_content_sections)]);
+        $index_page_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
         // แสดงทุกหมวดของหน้าหลัก
         $idx_keys = array_map(function ($k) use ($general_content_sections) {
@@ -618,8 +664,8 @@ if ($active_tab == 'index_page') {
         $placeholders = implode(',', array_fill(0, count($idx_keys), '?'));
         $stmt = $conn->prepare("SELECT * FROM department_contents WHERE department_id IS NULL AND section IN ($placeholders) ORDER BY section ASC, sort_order ASC, id DESC");
         $stmt->execute($idx_keys);
+        $index_page_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    $index_page_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } elseif ($active_tab == 'news') {
     $news_items = $conn->query("SELECT * FROM news ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
 } elseif ($active_tab == 'departments') {
@@ -840,11 +886,6 @@ if ($active_tab == 'index_page') {
         </li>
         <?php if ($is_main_admin): ?>
         <li class="nav-item">
-            <a class="nav-link <?= $active_tab == 'news' ? 'active' : '' ?>" href="?tab=news">
-                <i class="bi bi-megaphone-fill fs-5 icon-news"></i> ข่าวประชาสัมพันธ์
-            </a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link <?= $active_tab == 'banners' ? 'active' : '' ?>" href="?tab=banners">
                 <i class="bi bi-image fs-5"></i> Banner / Slider
             </a>
@@ -862,8 +903,13 @@ if ($active_tab == 'index_page') {
         <?php if($active_tab == 'index_page'): ?>
         <div>
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <?php if ($selected_idx_section === 'idx_news'): ?>
+                <h5 class="text-hospital mb-0 fw-bold"><i class="bi bi-megaphone-fill me-1"></i>จัดการข่าวประชาสัมพันธ์</h5>
+                <a href="all_news.php" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-up-right"></i> เปิดหน้าข่าวทั้งหมด</a>
+                <?php else: ?>
                 <h5 class="text-hospital mb-0 fw-bold"><i class="bi bi-house-door-fill me-1"></i>จัดการเนื้อหาหน้าหลัก (Index)</h5>
                 <a href="index.php" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-up-right"></i> เปิดหน้าหลัก</a>
+                <?php endif; ?>
             </div>
 
             <div class="admin-form-container">
@@ -885,6 +931,7 @@ if ($active_tab == 'index_page') {
                     </div>
                 </form>
 
+                <?php if ($selected_idx_section !== 'idx_news'): ?>
                 <!-- ฟอร์มเพิ่ม/แก้ไข -->
                 <?php
                     $idx_create_section = $selected_idx_section !== '' ? $selected_idx_section : array_key_first($index_page_sections);
@@ -1028,6 +1075,102 @@ if ($active_tab == 'index_page') {
                 </tbody>
             </table>
             </div>
+        <?php else: ?>
+            </div><!-- /admin-form-container -->
+            <form action="admin.php?tab=index_page&idx_section=idx_news" method="POST" enctype="multipart/form-data" class="admin-form-container mt-3">
+                <input type="hidden" name="action_news" value="create">
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">หัวข้อข่าว <span class="text-danger">*</span></label>
+                        <input type="text" name="title" class="form-control" placeholder="หัวข้อข่าว" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">วันที่</label>
+                        <input type="text" name="created_at" id="news_date_picker" class="form-control bg-white" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">ลิงก์เพิ่มเติม (ถ้ามี)</label>
+                        <input type="url" name="link_url" class="form-control" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label fw-bold">เนื้อหาข่าว</label>
+                    <textarea name="content" class="form-control" rows="3" placeholder="รายละเอียดข่าว..."></textarea>
+                </div>
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">รูปภาพ / ไฟล์แนบ</label>
+                        <input type="file" name="image[]" class="form-control" accept="image/*,application/pdf" multiple>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check form-switch p-2 border rounded bg-white form-switch-indented">
+                            <input class="form-check-input" type="checkbox" name="is_new" id="news_is_new" value="1">
+                            <label class="form-check-label ms-2" for="news_is_new"><strong>เปิดแสดงป้าย "ใหม่"</strong></label>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button type="submit" class="btn btn-hospital-orange w-100">+ เพิ่มข่าว</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="admin-table-scroll mt-4">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="13%">รูปภาพ</th>
+                        <th>หัวข้อ / รายละเอียด</th>
+                        <th width="12%">วันที่</th>
+                        <th width="8%">ป้าย</th>
+                        <th width="15%">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if(empty($news_items)): ?>
+                        <tr><td colspan="5" class="text-center text-muted py-4">ยังไม่มีข่าวประชาสัมพันธ์</td></tr>
+                    <?php endif; ?>
+                    <?php foreach($news_items as $row):
+                        $n_imgs     = parseFileNames($row['image_name'] ?? '');
+                        $n_first    = $n_imgs[0] ?? '';
+                    ?>
+                    <tr>
+                        <td>
+                            <?php if(!empty($n_first)): ?>
+                                <img src="../uploads/<?= htmlspecialchars($n_first) ?>" style="width:80px;height:60px;object-fit:cover;border-radius:4px;" onerror="this.src='https://placehold.co/80x60?text=No+Img'">
+                            <?php else: ?>
+                                <span class="badge bg-secondary">ไม่มีรูป</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <strong><?= htmlspecialchars($row['title']) ?></strong>
+                            <div class="small text-muted text-preview-short"><?php
+                                $n_preview = mb_substr($row['content'] ?? '', 0, 100, 'UTF-8');
+                                echo htmlspecialchars($n_preview);
+                                if (mb_strlen($row['content'] ?? '', 'UTF-8') > 100) echo '...';
+                            ?></div>
+                            <?php if(!empty($row['link_url'])): ?>
+                                <div class="small mt-1 text-preview-link"><i class="bi bi-link-45deg text-primary"></i> <a href="<?= htmlspecialchars($row['link_url']) ?>" target="_blank" class="text-decoration-none"><?= htmlspecialchars($row['link_url']) ?></a></div>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= dateToThaiText($row['created_at']) ?></td>
+                        <td>
+                            <?php if((int)$row['is_new'] === 1): ?>
+                                <span class="badge bg-danger">ใหม่</span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-edit-style btn-sm me-1"
+                                onclick='editNews(<?= (int)$row["id"] ?>, <?= json_encode($row["title"], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= json_encode($row["content"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= json_encode($row["created_at"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= json_encode($row["image_name"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= (int)$row["is_new"] ?>, <?= json_encode($row["link_url"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>)'>แก้ไข</button>
+                            <a href="admin.php?tab=index_page&idx_section=idx_news&del_news=<?= $row['id'] ?>" class="btn btn-outline-delete-style btn-sm" onclick="return confirm('ต้องการลบข่าวนี้หรือไม่?')">ลบ</a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            </div>
+        <?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -1208,7 +1351,22 @@ if ($active_tab == 'index_page') {
                     <input type="hidden" name="old_file" id="dept_content_old_file">
 
                     <input type="hidden" name="department_id" id="dept_content_department_id" value="<?= $selected_dept_id ?>">
+                    <?php if ($selected_dept_section === '' && !$selected_is_general): ?>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">หมวดข้อมูล <span class="text-danger">*</span></label>
+                        <select name="section" id="dept_content_section" class="form-select">
+                            <?php foreach ($department_section_groups as $grp => $items): ?>
+                                <optgroup label="<?= htmlspecialchars($grp) ?>">
+                                <?php foreach ($items as $k => $lbl): ?>
+                                    <option value="<?= htmlspecialchars($k) ?>"><?= htmlspecialchars($lbl) ?></option>
+                                <?php endforeach; ?>
+                                </optgroup>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php else: ?>
                     <input type="hidden" name="section" id="dept_content_section" value="<?= htmlspecialchars($create_section_value) ?>">
+                    <?php endif; ?>
 
                     <div class="row g-2 mb-2">
                         <div class="col-md-8">
@@ -1347,108 +1505,6 @@ if ($active_tab == 'index_page') {
                 </table>
                 </div>
             <?php endif; ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if($active_tab == 'news'): ?>
-        <div>
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                <h5 class="text-hospital mb-0 fw-bold"><i class="bi bi-megaphone-fill me-1"></i>จัดการข่าวประชาสัมพันธ์</h5>
-                <a href="all_news.php" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-up-right"></i> เปิดหน้าข่าวทั้งหมด</a>
-            </div>
-            <form action="admin.php?tab=news" method="POST" enctype="multipart/form-data" class="admin-form-container">
-                <input type="hidden" name="action_news" value="create">
-                <div class="row g-2 mb-2">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">หัวข้อข่าว <span class="text-danger">*</span></label>
-                        <input type="text" name="title" class="form-control" placeholder="หัวข้อข่าว" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">วันที่</label>
-                        <input type="text" name="created_at" id="news_date_picker" class="form-control bg-white" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">ลิงก์เพิ่มเติม (ถ้ามี)</label>
-                        <input type="url" name="link_url" class="form-control" placeholder="https://...">
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label fw-bold">เนื้อหาข่าว</label>
-                    <textarea name="content" class="form-control" rows="3" placeholder="รายละเอียดข่าว..."></textarea>
-                </div>
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-5">
-                        <label class="form-label fw-bold">รูปภาพ / ไฟล์แนบ</label>
-                        <input type="file" name="image[]" class="form-control" accept="image/*,application/pdf" multiple>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-check form-switch p-2 border rounded bg-white form-switch-indented">
-                            <input class="form-check-input" type="checkbox" name="is_new" id="news_is_new" value="1">
-                            <label class="form-check-label ms-2" for="news_is_new"><strong>เปิดแสดงป้าย "ใหม่"</strong></label>
-                        </div>
-                    </div>
-                    <div class="col-md-3 text-end">
-                        <button type="submit" class="btn btn-hospital-orange w-100">+ เพิ่มข่าว</button>
-                    </div>
-                </div>
-            </form>
-
-            <div class="admin-table-scroll mt-4">
-            <table class="table align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th width="13%">รูปภาพ</th>
-                        <th>หัวข้อ / รายละเอียด</th>
-                        <th width="12%">วันที่</th>
-                        <th width="8%">ป้าย</th>
-                        <th width="15%">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if(empty($news_items)): ?>
-                        <tr><td colspan="5" class="text-center text-muted py-4">ยังไม่มีข่าวประชาสัมพันธ์</td></tr>
-                    <?php endif; ?>
-                    <?php foreach($news_items as $row):
-                        $n_imgs     = parseFileNames($row['image_name'] ?? '');
-                        $n_first    = $n_imgs[0] ?? '';
-                    ?>
-                    <tr>
-                        <td>
-                            <?php if(!empty($n_first)): ?>
-                                <img src="../uploads/<?= htmlspecialchars($n_first) ?>" style="width:80px;height:60px;object-fit:cover;border-radius:4px;" onerror="this.src='https://placehold.co/80x60?text=No+Img'">
-                            <?php else: ?>
-                                <span class="badge bg-secondary">ไม่มีรูป</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <strong><?= htmlspecialchars($row['title']) ?></strong>
-                            <div class="small text-muted text-preview-short"><?php
-                                $n_preview = mb_substr($row['content'] ?? '', 0, 100, 'UTF-8');
-                                echo htmlspecialchars($n_preview);
-                                if (mb_strlen($row['content'] ?? '', 'UTF-8') > 100) echo '...';
-                            ?></div>
-                            <?php if(!empty($row['link_url'])): ?>
-                                <div class="small mt-1 text-preview-link"><i class="bi bi-link-45deg text-primary"></i> <a href="<?= htmlspecialchars($row['link_url']) ?>" target="_blank" class="text-decoration-none"><?= htmlspecialchars($row['link_url']) ?></a></div>
-                            <?php endif; ?>
-                        </td>
-                        <td><?= dateToThaiText($row['created_at']) ?></td>
-                        <td>
-                            <?php if((int)$row['is_new'] === 1): ?>
-                                <span class="badge bg-danger">ใหม่</span>
-                            <?php else: ?>
-                                <span class="badge bg-secondary">-</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <button class="btn btn-outline-edit-style btn-sm me-1"
-                                onclick='editNews(<?= (int)$row["id"] ?>, <?= json_encode($row["title"], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= json_encode($row["content"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= json_encode($row["created_at"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= json_encode($row["image_name"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>, <?= (int)$row["is_new"] ?>, <?= json_encode($row["link_url"] ?? "", JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE) ?>)'>แก้ไข</button>
-                            <a href="admin.php?tab=news&del_news=<?= $row['id'] ?>" class="btn btn-outline-delete-style btn-sm" onclick="return confirm('ต้องการลบข่าวนี้หรือไม่?')">ลบ</a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-            </div>
         </div>
         <?php endif; ?>
 
@@ -1669,8 +1725,11 @@ if ($active_tab == 'index_page') {
                             <?php endif; ?>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-outline-edit-style btn-sm" data-bs-toggle="modal" data-bs-target="#pwdModal<?= (int)$u['id'] ?>">
-                                <i class="bi bi-key-fill"></i> เปลี่ยนรหัส
+                            <button type="button" class="btn btn-outline-edit-style btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal<?= (int)$u['id'] ?>">
+                                <i class="bi bi-pencil-fill"></i> แก้ไข
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#pwdModal<?= (int)$u['id'] ?>">
+                                <i class="bi bi-key-fill"></i> รหัสผ่าน
                             </button>
                             <?php if ((int)$u['id'] !== (int)$_SESSION['user_id']): ?>
                                 <a href="admin.php?tab=users&del_user=<?= (int)$u['id'] ?>" class="btn btn-outline-delete-style btn-sm" onclick="return confirm('ยืนยันการลบผู้ใช้ <?= htmlspecialchars(addslashes($u['username'])) ?> ?')">
@@ -1709,12 +1768,56 @@ if ($active_tab == 'index_page') {
                 </div>
             </div>
             <?php endforeach; ?>
+
+            <!-- Modals แก้ไขข้อมูลผู้ใช้ -->
+            <?php foreach ($all_users as $u): ?>
+            <div class="modal fade" id="editUserModal<?= (int)$u['id'] ?>" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST" action="admin.php?tab=users">
+                            <input type="hidden" name="action_user" value="update">
+                            <input type="hidden" name="id" value="<?= (int)$u['id'] ?>">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-hospital fw-bold"><i class="bi bi-pencil-fill me-1"></i>แก้ไขผู้ใช้: <?= htmlspecialchars($u['username']) ?></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">ชื่อที่แสดง</label>
+                                    <input type="text" name="u_display_name" class="form-control" value="<?= htmlspecialchars($u['display_name'] ?? '') ?>">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">ประเภทผู้ใช้</label>
+                                    <select name="u_role" class="form-select eu-role-select" data-uid="<?= (int)$u['id'] ?>" onchange="toggleEditUserDept(this)">
+                                        <option value="dept" <?= $u['role'] === 'dept' ? 'selected' : '' ?>>Admin แผนก</option>
+                                        <option value="main" <?= $u['role'] === 'main' ? 'selected' : '' ?>>Admin หลัก</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 eu-dept-row-<?= (int)$u['id'] ?>" <?= $u['role'] === 'main' ? 'style="display:none"' : '' ?>>
+                                    <label class="form-label fw-bold">แผนกที่รับผิดชอบ</label>
+                                    <select name="u_department_id" class="form-select">
+                                        <option value="0">— เลือกแผนก —</option>
+                                        <?php foreach ($all_depts as $d): ?>
+                                            <option value="<?= (int)$d['id'] ?>" <?= (int)$d['id'] === (int)$u['department_id'] ? 'selected' : '' ?>><?= htmlspecialchars($d['name']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                                <button type="submit" class="btn btn-hospital-orange">บันทึก</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
         <?php endif; ?>
 
     </div></div><div class="modal fade" id="modalNews" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <form action="admin.php?tab=news" method="POST" enctype="multipart/form-data" class="modal-content">
+    <form action="admin.php?tab=index_page&idx_section=idx_news" method="POST" enctype="multipart/form-data" class="modal-content">
       <div class="modal-header"><h5 class="text-hospital fw-bold">แก้ไขข่าวประชาสัมพันธ์</h5></div>
       <div class="modal-body">
         <input type="hidden" name="action_news" value="update">
@@ -1855,7 +1958,7 @@ function formatYearToThai(instance) {
     }
 }
 
-<?php if($active_tab == 'news'): ?>
+<?php if($active_tab == 'index_page' && $selected_idx_section === 'idx_news'): ?>
     const mainPicker      = flatpickr("#news_date_picker", flatpickrConfig);
     const modalNewsPicker = flatpickr("#edit_news_date",   flatpickrConfig);
 <?php endif; ?>
@@ -1991,6 +2094,13 @@ function toggleUserDeptRow() {
     row.style.display = (el.value === 'dept') ? 'flex' : 'none';
 }
 document.addEventListener('DOMContentLoaded', toggleUserDeptRow);
+
+// สลับช่อง "แผนก" ใน edit-user modals
+function toggleEditUserDept(sel) {
+    const uid = sel.dataset.uid;
+    const row = document.querySelector('.eu-dept-row-' + uid);
+    if (row) row.style.display = (sel.value === 'dept') ? '' : 'none';
+}
 </script>
 </body>
 </html>

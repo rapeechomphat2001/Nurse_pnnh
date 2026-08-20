@@ -37,7 +37,7 @@
         let html = '';
         files.forEach(fname => {
             if (!fname || fname === 'default.jpg') return;
-            const safe = esc('uploads/' + fname);
+            const safe = AppSecurity.safeUploadPath(fname);
             const ext = extOf(fname);
             if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
                 html += `<a href="${safe}" target="_blank"><img src="${safe}" class="dc-img shadow-sm border" alt="" onerror="this.style.display='none'"></a>`;
