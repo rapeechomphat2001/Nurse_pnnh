@@ -4,7 +4,7 @@ require_once __DIR__ . '/security.php';
 
 // อ่านค่าตั้งค่า DB จากไฟล์ .env ที่ root ของโปรเจกต์ (ไฟล์เดียวกับที่ฝั่ง Node.js ใช้)
 // เวลาขึ้น server จริง แค่แก้ค่าใน .env ที่ server ไม่ต้องแก้โค้ดไฟล์นี้
-$envPath = __DIR__ . '/../.env';
+$envPath = __DIR__ . '/../../.env';
 $env = [];
 if (file_exists($envPath)) {
     foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
