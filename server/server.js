@@ -5,7 +5,7 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || "127.0.0.1";
+const HOST = process.env.HOST || "0.0.0.0";
 const configuredOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
@@ -18,9 +18,12 @@ function isAllowedOrigin(origin) {
     const url = new URL(origin);
     const isLocalHost = ["localhost", "127.0.0.1"].includes(url.hostname);
     const isLocalTestDomain = url.hostname.endsWith(".test");
+    const isLanIP = /^192\.168\.\d+\.\d+$/.test(url.hostname)
+      || /^10\.\d+\.\d+\.\d+$/.test(url.hostname)
+      || /^172\.(1[6-9]|2\d|3[01])\.\d+\.\d+$/.test(url.hostname);
 
     return ["http:", "https:"].includes(url.protocol) &&
-      (isLocalHost || isLocalTestDomain);
+      (isLocalHost || isLocalTestDomain || isLanIP);
   } catch {
     return false;
   }
