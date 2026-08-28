@@ -9,6 +9,6 @@ Options -Indexes
 # ปิด access โฟลเดอร์ server/ และ scratchpad
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^server/ - [F,L]
+    RewriteRule ^backend/ - [F,L]
     RewriteRule ^\.claude/ - [F,L]
 </IfModule>
