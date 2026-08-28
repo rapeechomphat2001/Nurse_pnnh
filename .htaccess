@@ -1,0 +1,14 @@
+# ปิด directory listing
+Options -Indexes
+
+# ปิด access ไฟล์อันตราย
+<FilesMatch "^(\.env.*|.*\.sql|.*\.log|composer\..*)$">
+    Require all denied
+</FilesMatch>
+
+# ปิด access โฟลเดอร์ server/ และ scratchpad
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^server/ - [F,L]
+    RewriteRule ^\.claude/ - [F,L]
+</IfModule>

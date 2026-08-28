@@ -1,0 +1,5 @@
+# ปิดการรัน PHP ในโฟลเดอร์ uploads (ป้องกัน web shell)
+php_flag engine off
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
