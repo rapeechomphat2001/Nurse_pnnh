@@ -290,17 +290,17 @@ try {
 // ---------- helpers ----------
 function uploadAdminFile($fieldName, $prefix, $oldFile = '') {
     if (empty($_FILES[$fieldName]['name'])) return $oldFile;
-    if (!is_dir('../../uploads')) mkdir('../../uploads', 0777, true);
+    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
     $orig     = basename($_FILES[$fieldName]['name']);
     $safeName = trim(preg_replace('/[\x00\/\\\\:*?"<>|]+/', '', $orig), '. ');
     $fileName = time() . '_' . $prefix . '_' . ($safeName ?: 'file');
-    move_uploaded_file($_FILES[$fieldName]['tmp_name'], '../../uploads/' . $fileName);
+    move_uploaded_file($_FILES[$fieldName]['tmp_name'], '../uploads/' . $fileName);
     return $fileName;
 }
 
 function uploadMultipleAdminFiles($fieldName, $prefix, $oldFiles = '') {
     if (empty($_FILES[$fieldName]['name'][0])) return $oldFiles;
-    if (!is_dir('../../uploads')) mkdir('../../uploads', 0777, true);
+    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
 
     $existingFiles = [];
     if (!empty($oldFiles)) {
@@ -317,7 +317,7 @@ function uploadMultipleAdminFiles($fieldName, $prefix, $oldFiles = '') {
                 $orig        = basename($fileName);
                 $safeName    = trim(preg_replace('/[\x00\/\\\\:*?"<>|]+/', '', $orig), '. ');
                 $newFileName = time() . '_' . $index . '_' . $prefix . '_' . ($safeName ?: 'file');
-                if (move_uploaded_file($_FILES[$fieldName]['tmp_name'][$index], '../../uploads/' . $newFileName)) {
+                if (move_uploaded_file($_FILES[$fieldName]['tmp_name'][$index], '../uploads/' . $newFileName)) {
                     $uploadedFiles[] = $newFileName;
                 }
             }

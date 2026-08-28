@@ -14,7 +14,6 @@ Options -Indexes
 
     # Transparently forward requests to frontend/ — URL ไม่เปลี่ยน
     RewriteCond %{REQUEST_URI} !frontend [NC]
-    RewriteCond %{REQUEST_URI} !uploads  [NC]
     RewriteCond %{REQUEST_URI} !backend  [NC]
     RewriteRule ^(.*)$ frontend/$1 [L]
 </IfModule>
